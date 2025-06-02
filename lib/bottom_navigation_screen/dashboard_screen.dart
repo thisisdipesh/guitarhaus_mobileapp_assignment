@@ -14,10 +14,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int currentIndex = 0;
 
   final List<Map<String, dynamic>> categories = [
-    {"icon": Icons.edit, "label": "Pens", "color": Colors.lime},
-    {"icon": Icons.book, "label": "Notebooks", "color": Colors.lightBlue},
-    {"icon": Icons.brush, "label": "Art Supplies", "color": Colors.redAccent},
-    {"icon": Icons.work, "label": "Office", "color": Colors.blueGrey},
+    {"icon": Icons.edit, "label": "Bass Guitars", "color": Colors.lime},
+    {"icon": Icons.book, "label": "Electric Guitar", "color": Colors.lightBlue},
+    {"icon": Icons.brush, "label": "Guitar Strings", "color": Colors.redAccent},
+    {"icon": Icons.work, "label": "Other Items", "color": Colors.blueGrey},
   ];
 
   final List<Map<String, dynamic>> featuredProducts = [
