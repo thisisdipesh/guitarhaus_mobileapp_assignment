@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'view/login_screen.dart'; 
-import 'view/signup_screen.dart'; 
-import 'view/splash_screen.dart'; 
+import 'features/auth/presentation/view/login_screen.dart'; 
+import 'features/auth/presentation/view/signup_screen.dart'; 
+import 'features/auth/presentation/view/splash_screen.dart'; 
 void main() {
   runApp(GuitarHaus());
 }
@@ -12,7 +12,7 @@ class GuitarHaus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'GuitarHaus',
+      title: 'GuitarHauss',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Roboto',
