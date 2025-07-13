@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:guitarhaus_mobileapp_assignment/app/theme/colors/themecolor.dart';
 
 ThemeData getApplicationTheme() {
-  final themecolor=new Themecolor();
+  final themecolor=Themecolor();
   return ThemeData(
       useMaterial3: false,
       primarySwatch: themecolor.customSwatch,
