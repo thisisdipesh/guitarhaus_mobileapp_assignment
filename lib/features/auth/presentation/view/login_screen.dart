@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/network/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,67 +13,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final ApiService _apiService = ApiService();
 
   String? emailError;
   String? passwordError;
   bool? isPasswordValid;
   bool isPasswordVisible = false;
-
-  void validateFormOnLogin() {
-    setState(() {
-      emailError = null;
-      passwordError = null;
-
-      final email = emailController.text.trim();
-      final password = passwordController.text;
-
-      if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
-        emailError = 'Enter a valid email';
-      }
-
-      if (password.length != 6) {
-        passwordError = 'Password must be 6 digits';
-        isPasswordValid = false;
-      } else if (password != '123456') {
-        passwordError = 'Invalid password';
-        isPasswordValid = false;
-      } else {
-        passwordError = null;
-        isPasswordValid = true;
-      }
-    });
-  }
-
-  void onLoginPressed() {
-    validateFormOnLogin();
-
-    if (emailError == null && isPasswordValid == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Login successful"),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          duration: const Duration(milliseconds: 800),
-        ),
-      );
-
-      Navigator.pushReplacementNamed(context, '/dashboard');
-      resetValidation();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Please fix errors"),
-          backgroundColor: Colors.lightGreen,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
+  bool isLoading = false;
 
   void resetValidation() {
     setState(() {
@@ -78,6 +27,109 @@ class _LoginScreenState extends State<LoginScreen> {
       passwordError = null;
       isPasswordValid = null;
     });
+  }
+
+  Future<void> onLoginPressed() async {
+    setState(() {
+      isLoading = true;
+      resetValidation();
+    });
+
+    try {
+      final email = emailController.text.trim();
+      final password = passwordController.text;
+
+      // Basic validation
+      if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
+        setState(() {
+          emailError = 'Enter a valid email';
+          isLoading = false;
+        });
+        return;
+      }
+
+      if (password.isEmpty) {
+        setState(() {
+          passwordError = 'Password is required';
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Call API
+      final response = await _apiService.login(email, password);
+      
+      if (response.statusCode == 200) {
+        final data = response.data;
+        
+        // Store token and user data
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['token']);
+        await prefs.setString('userId', data['userId']);
+        await prefs.setString('userRole', data['role']);
+
+        // Set auth token for future API calls
+        _apiService.setAuthToken(data['token']);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Login successful"),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              duration: const Duration(milliseconds: 800),
+            ),
+          );
+
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'Login failed';
+      if (e.response?.statusCode == 401) {
+        errorMessage = 'Invalid email or password';
+      } else if (e.response?.data != null && e.response?.data['message'] != null) {
+        errorMessage = e.response!.data['message'];
+      }
+
+      setState(() {
+        passwordError = errorMessage;
+        isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        passwordError = 'Network error. Please try again.';
+        isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Network error. Please try again."),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   OutlineInputBorder buildPasswordBorder() {
@@ -208,7 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: onLoginPressed,
+                        onPressed: isLoading ? null : onLoginPressed,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0A1B2E),
                           minimumSize: const Size(double.infinity, 52),
@@ -216,14 +268,23 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Text(
+                                "Login",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -250,22 +311,30 @@ class _LoginScreenState extends State<LoginScreen> {
                           backgroundColor: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Don't have an account? "),
+                          GestureDetector(
+                            onTap: () {
+                              resetValidation();
+                              Navigator.pushReplacementNamed(context, '/signup');
+                            },
+                            child: const Text(
+                              "Sign up",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF0A1B2E),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  resetValidation();
-                  Navigator.pushNamed(context, '/signup');
-                },
-                child: const Text(
-                  "Don't have an account? Sign up",
-                  style: TextStyle(color: Colors.white, fontSize: 15),
-                ),
-              ),
-              const SizedBox(height: 10),
             ],
           ),
         ),

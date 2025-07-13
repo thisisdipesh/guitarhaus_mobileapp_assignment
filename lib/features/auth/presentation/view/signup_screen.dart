@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/network/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -12,6 +15,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final ApiService _apiService = ApiService();
 
   String? nameError;
   String? emailError;
@@ -20,6 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool isPasswordVisible = false;
   bool isConfirmPasswordVisible = false;
+  bool isLoading = false;
 
   void resetValidation() {
     setState(() {
@@ -30,40 +35,143 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  void onSignupPressed() {
-    resetValidation();
-    String name = nameController.text.trim();
-    String email = emailController.text.trim();
-    String password = passwordController.text;
-    String confirmPassword = confirmPasswordController.text;
-
+  Future<void> onSignupPressed() async {
     setState(() {
-      if (name.isEmpty) nameError = "Name is required";
-      if (email.isEmpty || !email.contains('@')) emailError = "Valid email required";
-      if (password.length < 6) passwordError = "Password must be at least 6 digits";
-      if (confirmPassword != password) confirmPasswordError = "Passwords do not match";
+      isLoading = true;
+      resetValidation();
+    });
 
-      if (nameError == null && emailError == null && passwordError == null && confirmPasswordError == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Signup successful"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+    try {
+      String name = nameController.text.trim();
+      String email = emailController.text.trim();
+      String password = passwordController.text;
+      String confirmPassword = confirmPasswordController.text;
 
-        Future.delayed(const Duration(seconds: 2), () {
-          resetValidation();
+      // Validation
+      if (name.isEmpty) {
+        setState(() {
+          nameError = "Name is required";
+          isLoading = false;
+        });
+        return;
+      }
+
+      if (email.isEmpty || !email.contains('@')) {
+        setState(() {
+          emailError = "Valid email required";
+          isLoading = false;
+        });
+        return;
+      }
+
+      if (password.length < 6) {
+        setState(() {
+          passwordError = "Password must be at least 6 characters";
+          isLoading = false;
+        });
+        return;
+      }
+
+      if (confirmPassword != password) {
+        setState(() {
+          confirmPasswordError = "Passwords do not match";
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Split name into first and last name
+      List<String> nameParts = name.split(' ');
+      String firstName = nameParts.first;
+      String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : 'User';
+
+      // Call API
+      final response = await _apiService.register({
+        'fname': firstName,
+        'lname': lastName,
+        'email': email,
+        'password': password,
+        'phone': 1234567890, // You can add a phone field to the UI
+      });
+
+      if (response.statusCode == 201) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Signup successful! Please login."),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // Clear form
           nameController.clear();
           emailController.clear();
           passwordController.clear();
           confirmPasswordController.clear();
-        });
+
+          // Navigate to login
+          Navigator.pushReplacementNamed(context, '/login');
+        }
       }
-    });
+    } on DioException catch (e) {
+      String errorMessage = 'Signup failed';
+      
+      // Debug information
+      print('DioException: ${e.message}');
+      print('Status Code: ${e.response?.statusCode}');
+      print('Response Data: ${e.response?.data}');
+      
+      if (e.response?.statusCode == 400) {
+        if (e.response?.data != null && e.response?.data['message'] != null) {
+          errorMessage = e.response!.data['message'];
+        }
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        errorMessage = 'Connection timeout. Please check your internet connection.';
+      } else if (e.type == DioExceptionType.connectionError) {
+        errorMessage = 'Connection error. Please check if the server is running.';
+      }
+
+      setState(() {
+        emailError = errorMessage;
+        isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      print('General Exception: $e');
+      setState(() {
+        emailError = 'Network error. Please try again.';
+        isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Network error. Please try again."),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -82,7 +190,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Column(
                 children: [
                   Image.asset(
-                    'assets/image/guitahaus.png',
+                    'assets/image/guitarhaus.png',
                     height: 80,
                     errorBuilder: (context, error, stackTrace) =>
                         const Icon(Icons.error, color: Colors.limeAccent),
@@ -124,7 +232,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       // Name
                       _buildInputField(
                         controller: nameController,
-                        hintText: "Name",
+                        hintText: "Full Name",
                         icon: Icons.person_outline,
                         errorText: nameError,
                       ),
@@ -174,21 +282,30 @@ class _SignupScreenState extends State<SignupScreen> {
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
-                          onPressed: onSignupPressed,
+                          onPressed: isLoading ? null : onSignupPressed,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFF5722),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : const Text(
+                                  "Sign Up",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -251,19 +368,24 @@ class _SignupScreenState extends State<SignupScreen> {
     return TextField(
       controller: controller,
       obscureText: obscureText,
+      style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: const TextStyle(fontSize: 16),
         prefixIcon: Icon(icon),
         suffixIcon: suffixIcon != null
-            ? IconButton(icon: Icon(suffixIcon), onPressed: onSuffixTap)
+            ? IconButton(
+                icon: Icon(suffixIcon),
+                onPressed: onSuffixTap,
+              )
             : null,
-        errorText: errorText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none, 
-        ),
         filled: true,
         fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        errorText: errorText,
       ),
     );
   }

@@ -8,6 +8,8 @@ import 'package:guitarhaus_mobileapp_assignment/features/home/view_model/homepag
 import 'package:guitarhaus_mobileapp_assignment/features/splash/splash_viewmodel.dart/splash_viewmodel.dart';
 
 class SplashScreenView extends StatefulWidget {
+  const SplashScreenView({super.key});
+
   @override
   State<SplashScreenView> createState() => _SplashScreenViewState();
 }

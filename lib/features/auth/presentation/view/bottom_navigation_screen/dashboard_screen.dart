@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'cart_screen.dart'; // Make sure this path is correct
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../../core/network/api_service.dart';
+import 'cart_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
 
@@ -12,26 +15,74 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int currentIndex = 0;
+  final ApiService _apiService = ApiService();
+  List<Map<String, dynamic>> featuredProducts = [];
+  bool isLoading = true;
+  String? errorMessage;
 
   final List<Map<String, dynamic>> categories = [
-    {"icon": Icons.edit, "label": "Bass Guitars", "color": Colors.lime},
-    {"icon": Icons.book, "label": "Electric Guitar", "color": Colors.lightBlue},
-    {"icon": Icons.brush, "label": "Guitar Strings", "color": Colors.redAccent},
-    {"icon": Icons.work, "label": "Other Items", "color": Colors.blueGrey},
+    {"icon": Icons.music_note, "label": "Electric", "category": "Electric"},
+    {"icon": Icons.music_note_outlined, "label": "Acoustic", "category": "Acoustic"},
+    {"icon": Icons.music_note_rounded, "label": "Bass", "category": "Bass"},
+    {"icon": Icons.music_note_sharp, "label": "Classical", "category": "Classical"},
+    {"icon": Icons.music_note, "label": "Ukulele", "category": "Ukulele"},
   ];
 
-  final List<Map<String, dynamic>> featuredProducts = [
-    {
-      "name": "Bass Guitar",
-      "price": "\Rs .8.99",
-      "image": "assets/image/bass_guitar.jpg",
-    },
-    {
-      "name": "Electric Guitar",
-      "price": "\$12.99",
-      "image": "assets/image/electirc_guitar.jpeg",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadFeaturedGuitars();
+    _initializeAuthToken();
+  }
+
+  Future<void> _initializeAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      _apiService.setAuthToken(token);
+    }
+  }
+
+  Future<void> _loadFeaturedGuitars() async {
+    try {
+      final response = await _apiService.getFeaturedGuitars();
+      if (response.statusCode == 200) {
+        final guitars = response.data['data'] as List;
+        setState(() {
+          featuredProducts = guitars.map((guitar) => {
+            "name": guitar['name'],
+            "price": "\$${guitar['price'].toStringAsFixed(2)}",
+            "image": guitar['images']?.isNotEmpty == true 
+                ? guitar['images'][0] 
+                : "assets/image/bass_guitar.jpg", // fallback image
+            "id": guitar['_id'],
+            "brand": guitar['brand'],
+            "rating": guitar['rating']?.toDouble() ?? 0.0,
+          }).toList();
+          isLoading = false;
+        });
+      }
+    } on DioException catch (e) {
+      setState(() {
+        errorMessage = 'Failed to load guitars';
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Network error';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    _apiService.clearAuthToken();
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text("Logout"),
-              onTap: () {
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-              },
+              onTap: _logout,
             ),
           ],
         ),
@@ -114,7 +163,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: const TextField(
               decoration: InputDecoration(
                 icon: Icon(Icons.search),
-                hintText: 'Search',
+                hintText: 'Search guitars...',
                 border: InputBorder.none,
               ),
             ),
@@ -130,69 +179,141 @@ class _DashboardScreenState extends State<DashboardScreen> {
               separatorBuilder: (_, __) => const SizedBox(width: 16),
               itemBuilder: (context, index) {
                 final cat = categories[index];
-                return Column(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: cat['color'],
-                      radius: 24,
-                      child: Icon(cat['icon'], color: Colors.white),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      cat['label'],
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ],
+                return GestureDetector(
+                  onTap: () {
+                    // Navigate to category page
+                    // You can implement category filtering here
+                  },
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: cat['color'] ?? Colors.blue,
+                        radius: 24,
+                        child: Icon(cat['icon'], color: Colors.white),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        cat['label'],
+                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
           ),
           const SizedBox(height: 24),
-          const Text("Featured Products", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 220,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: featuredProducts.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 16),
-              itemBuilder: (context, index) {
-                final product = featuredProducts[index];
-                return Container(
-                  width: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-                        child: Image.asset(
-                          product['image'],
-                          height: 120,
-                          width: 150,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(product['name'], style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(product['price'], style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Featured Products", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              if (errorMessage != null)
+                Text(
+                  errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+            ],
           ),
+          const SizedBox(height: 12),
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+          else if (featuredProducts.isEmpty)
+            const Center(
+              child: Text(
+                "No featured guitars available",
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+            )
+          else
+            SizedBox(
+              height: 220,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: featuredProducts.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  final product = featuredProducts[index];
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to guitar details page
+                      // You can implement this later
+                    },
+                    child: Container(
+                      width: 150,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: const [
+                          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                            child: Image.asset(
+                              product['image'],
+                              height: 120,
+                              width: 150,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                height: 120,
+                                width: 150,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product['name'],
+                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  product['brand'],
+                                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                      product['price'],
+                                      style: const TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.bold),
+                                    ),
+                                    const Spacer(),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.star, size: 14, color: Colors.amber),
+                                        Text(
+                                          product['rating'].toString(),
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
