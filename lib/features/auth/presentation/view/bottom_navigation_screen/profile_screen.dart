@@ -50,7 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           isLoading = false;
         });
       }
-    } on DioException catch (e) {
+    } on DioException {
       setState(() {
         errorMessage = 'Failed to load profile';
         isLoading = false;

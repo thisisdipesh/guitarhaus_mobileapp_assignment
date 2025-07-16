@@ -53,7 +53,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           isLoading = false;
         });
       }
-    } on DioException catch (e) {
+    } on DioException {
       setState(() {
         errorMessage = 'Failed to load wishlist';
         isLoading = false;
