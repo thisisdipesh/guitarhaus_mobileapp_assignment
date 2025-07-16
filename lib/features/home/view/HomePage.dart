@@ -120,28 +120,28 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   _buildGuitarPickChip(
-                    'Electric',
-                    Icons.music_note,
+                    'Electric Guitar',
+                    Icons.electric_bolt,
                     Color(0xFFB799FF),
                   ),
                   _buildGuitarPickChip(
-                    'Acoustic',
+                    'Acoustic Guitar',
                     Icons.music_note,
                     Color(0xFF8F43EE),
                   ),
                   _buildGuitarPickChip(
-                    'Bass',
-                    Icons.music_note,
+                    'Bass Guitar',
+                    Icons.library_music,
                     Color(0xFF00C9A7),
                   ),
                   _buildGuitarPickChip(
-                    'Classical',
-                    Icons.music_note,
+                    'Classical Guitar',
+                    Icons.queue_music,
                     Color(0xFFFFB300),
                   ),
                   _buildGuitarPickChip(
                     'Ukulele',
-                    Icons.music_note,
+                    Icons.music_video,
                     Color(0xFFFD5E53),
                   ),
                 ],
@@ -162,7 +162,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 220,
+              height: 200,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildProductCard(Map<String, String> product) {
     return Container(
-      width: 180,
+      width: 170,
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
         color: const Color(0xFF232946),
@@ -243,13 +243,13 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Image.asset(
               product['image']!,
-              height: 100,
-              width: 180,
+              height: 80,
+              width: 170,
               fit: BoxFit.cover,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
