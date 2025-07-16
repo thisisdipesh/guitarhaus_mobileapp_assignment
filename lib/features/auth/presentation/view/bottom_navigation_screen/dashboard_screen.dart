@@ -14,6 +14,30 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int currentIndex = 0;
 
+  // Add a placeholder for the Guitars section
+  final Widget guitarsPage = Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        Icon(Icons.queue_music, size: 60, color: Color(0xFF8F43EE)),
+        SizedBox(height: 16),
+        Text(
+          'Guitars',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF8F43EE),
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Browse all guitars here soon!',
+          style: TextStyle(color: Colors.white70),
+        ),
+      ],
+    ),
+  );
+
   Future<void> _logout() async {
     // You can keep your logout logic here if needed
     // ...
@@ -69,14 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      body:
-          currentIndex == 0
-              ? const HomePage()
-              : currentIndex == 1
-              ? const FavoritesScreen()
-              : currentIndex == 2
-              ? const CartScreen()
-              : const ProfileScreen(),
+      body: _getBody(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         selectedItemColor: const Color(0xFF8F43EE),
@@ -94,6 +111,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: "Favorites",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.queue_music),
+            label: "Guitars",
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart_outlined),
             label: "Cart",
           ),
@@ -104,5 +125,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  Widget _getBody() {
+    switch (currentIndex) {
+      case 0:
+        return const HomePage();
+      case 1:
+        return const FavoritesScreen();
+      case 2:
+        return guitarsPage;
+      case 3:
+        return const CartScreen();
+      case 4:
+        return const ProfileScreen();
+      default:
+        return const HomePage();
+    }
   }
 }

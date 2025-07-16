@@ -2,53 +2,57 @@ import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
+  static const String baseUrl = 'http://192.168.1.82:3000/api/v1';
   late Dio _dio;
 
   ApiService() {
-    _dio = Dio(BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    ));
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
 
     // Add logging interceptor for debugging
-    _dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true,
-      requestBody: true,
-      responseHeader: true,
-      responseBody: true,
-      error: true,
-      compact: true,
-    ));
+    _dio.interceptors.add(
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+        compact: true,
+      ),
+    );
 
     // Add auth interceptor
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        // Add auth token if available
-        // You can get this from shared preferences or secure storage
-        // options.headers['Authorization'] = 'Bearer $token';
-        handler.next(options);
-      },
-      onError: (error, handler) {
-        // Handle common errors
-        if (error.response?.statusCode == 401) {
-          // Handle unauthorized
-        }
-        handler.next(error);
-      },
-    ));
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          // Add auth token if available
+          // You can get this from shared preferences or secure storage
+          // options.headers['Authorization'] = 'Bearer $token';
+          handler.next(options);
+        },
+        onError: (error, handler) {
+          // Handle common errors
+          if (error.response?.statusCode == 401) {
+            // Handle unauthorized
+          }
+          handler.next(error);
+        },
+      ),
+    );
   }
 
   // Authentication endpoints
   Future<Response> login(String email, String password) async {
-    return await _dio.post('/customers/login', data: {
-      'email': email,
-      'password': password,
-    });
+    return await _dio.post(
+      '/customers/login',
+      data: {'email': email, 'password': password},
+    );
   }
 
   Future<Response> register(Map<String, dynamic> userData) async {
@@ -59,7 +63,10 @@ class ApiService {
     return await _dio.get('/customers/getCustomer/$userId');
   }
 
-  Future<Response> updateUserProfile(String userId, Map<String, dynamic> userData) async {
+  Future<Response> updateUserProfile(
+    String userId,
+    Map<String, dynamic> userData,
+  ) async {
     return await _dio.put('/customers/updateCustomer/$userId', data: userData);
   }
 
@@ -111,16 +118,14 @@ class ApiService {
   }
 
   Future<Response> addToCart(String guitarId, int quantity) async {
-    return await _dio.post('/cart/add', data: {
-      'guitarId': guitarId,
-      'quantity': quantity,
-    });
+    return await _dio.post(
+      '/cart/add',
+      data: {'guitarId': guitarId, 'quantity': quantity},
+    );
   }
 
   Future<Response> updateCartItem(String itemId, int quantity) async {
-    return await _dio.put('/cart/update/$itemId', data: {
-      'quantity': quantity,
-    });
+    return await _dio.put('/cart/update/$itemId', data: {'quantity': quantity});
   }
 
   Future<Response> removeFromCart(String itemId) async {
@@ -154,9 +159,7 @@ class ApiService {
   }
 
   Future<Response> addToWishlist(String guitarId) async {
-    return await _dio.post('/wishlist/add', data: {
-      'guitarId': guitarId,
-    });
+    return await _dio.post('/wishlist/add', data: {'guitarId': guitarId});
   }
 
   Future<Response> removeFromWishlist(String guitarId) async {
@@ -176,11 +179,17 @@ class ApiService {
     return await _dio.get('/reviews/guitar/$guitarId');
   }
 
-  Future<Response> addReview(String guitarId, Map<String, dynamic> reviewData) async {
+  Future<Response> addReview(
+    String guitarId,
+    Map<String, dynamic> reviewData,
+  ) async {
     return await _dio.post('/reviews/guitar/$guitarId', data: reviewData);
   }
 
-  Future<Response> updateReview(String reviewId, Map<String, dynamic> reviewData) async {
+  Future<Response> updateReview(
+    String reviewId,
+    Map<String, dynamic> reviewData,
+  ) async {
     return await _dio.put('/reviews/$reviewId', data: reviewData);
   }
 
@@ -201,4 +210,4 @@ class ApiService {
   void clearAuthToken() {
     _dio.options.headers.remove('Authorization');
   }
-} 
+}

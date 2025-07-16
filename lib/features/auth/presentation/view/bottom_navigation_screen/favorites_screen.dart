@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/network/api_service.dart';
+import 'dart:ui';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -36,20 +37,26 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       final response = await _apiService.getWishlist();
       if (response.statusCode == 200) {
         final items = response.data['data'] as List;
-        
+
         setState(() {
-          wishlistItems = items.map((item) => {
-            "id": item['_id'],
-            "guitarId": item['guitar']['_id'],
-            "name": item['guitar']['name'],
-            "brand": item['guitar']['brand'],
-            "price": item['guitar']['price'].toDouble(),
-            "image": item['guitar']['images']?.isNotEmpty == true 
-                ? item['guitar']['images'][0] 
-                : "assets/image/bass_guitar.jpg",
-            "rating": item['guitar']['rating']?.toDouble() ?? 0.0,
-            "category": item['guitar']['category'],
-          }).toList();
+          wishlistItems =
+              items
+                  .map(
+                    (item) => {
+                      "id": item['_id'],
+                      "guitarId": item['guitar']['_id'],
+                      "name": item['guitar']['name'],
+                      "brand": item['guitar']['brand'],
+                      "price": item['guitar']['price'].toDouble(),
+                      "image":
+                          item['guitar']['images']?.isNotEmpty == true
+                              ? item['guitar']['images'][0]
+                              : "assets/image/bass_guitar.jpg",
+                      "rating": item['guitar']['rating']?.toDouble() ?? 0.0,
+                      "category": item['guitar']['category'],
+                    },
+                  )
+                  .toList();
           isLoading = false;
         });
       }
@@ -81,7 +88,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to remove: ${e.response?.data['message'] ?? 'Error'}'),
+          content: Text(
+            'Failed to remove: ${e.response?.data['message'] ?? 'Error'}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -102,7 +111,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to add to cart: ${e.response?.data['message'] ?? 'Error'}'),
+          content: Text(
+            'Failed to add to cart: ${e.response?.data['message'] ?? 'Error'}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -112,9 +123,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF696969),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF696969),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
@@ -124,14 +135,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
-            const Icon(Icons.star, color: Colors.blueAccent, size: 24),
+            const Icon(Icons.star, color: Color(0xFFB799FF), size: 26),
             const SizedBox(width: 8),
             const Text(
               'Favorites',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 22,
+                fontSize: 24,
                 fontFamily: 'Ubuntu-Bold',
+                letterSpacing: 1.2,
               ),
             ),
           ],
@@ -155,7 +167,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 } on DioException catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Failed to clear: ${e.response?.data['message'] ?? 'Error'}'),
+                      content: Text(
+                        'Failed to clear: ${e.response?.data['message'] ?? 'Error'}',
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -165,17 +179,36 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : wishlistItems.isEmpty
-                ? _buildEmptyWishlist()
-                : _buildWishlistItems(),
+      body: Stack(
+        children: [
+          // Gradient background
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF18122B), Color(0xFF8F43EE)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child:
+                isLoading
+                    ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFFB799FF),
+                        ),
+                      ),
+                    )
+                    : wishlistItems.isEmpty
+                    ? _buildEmptyWishlist()
+                    : _buildWishlistItems(),
+          ),
+        ],
       ),
     );
   }
@@ -185,7 +218,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 40),
-        const Icon(Icons.star_border, color: Colors.blueAccent, size: 80),
+        const Icon(Icons.star_border, color: Color(0xFFB799FF), size: 80),
         const SizedBox(height: 20),
         const Text(
           "No favorites",
@@ -198,7 +231,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
         const SizedBox(height: 8),
         const Text(
-          "Your favorite items will appear here.",
+          "Your favorite guitars will appear here.",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
@@ -209,18 +242,18 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         const SizedBox(height: 40),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: const Color(0xFF8F43EE),
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(14),
             ),
           ),
-          icon: const Icon(Icons.explore, color: Colors.black),
+          icon: const Icon(Icons.explore, color: Colors.white),
           label: const Text(
-            "Browse Products",
+            "Browse Guitars",
             style: TextStyle(
               fontSize: 16,
-              color: Colors.black,
+              color: Colors.white,
               fontFamily: 'Ubuntu-Bold',
             ),
           ),
@@ -237,97 +270,100 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       itemCount: wishlistItems.length,
       itemBuilder: (context, index) {
         final item = wishlistItems[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    item['image'],
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image, size: 40, color: Colors.grey),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.18),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      item['image'],
+                      width: 54,
+                      height: 54,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
+                  title: Text(
+                    item['name'],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      fontFamily: 'Ubuntu',
+                    ),
+                  ),
+                  subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item['name'],
+                        item['brand'] ?? '',
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          color: Colors.white70,
+                          fontSize: 13,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item['brand'],
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item['category'],
-                        style: TextStyle(
-                          color: Colors.blue[600],
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Text(
-                            '\$${item['price'].toStringAsFixed(2)}',
+                            ' ${item['price']}',
                             style: const TextStyle(
+                              color: Color(0xFFB799FF),
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                              fontSize: 16,
+                              fontSize: 15,
                             ),
                           ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              const Icon(Icons.star, size: 16, color: Colors.amber),
-                              Text(
-                                item['rating'].toString(),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ],
+                          const SizedBox(width: 8),
+                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                          Text(
+                            item['rating'].toString(),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.shopping_cart,
+                          color: Color(0xFF8F43EE),
+                        ),
+                        tooltip: 'Add to Cart',
+                        onPressed: () => _addToCart(item['guitarId']),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        tooltip: 'Remove',
+                        onPressed: () => _removeFromWishlist(item['guitarId']),
+                      ),
+                    ],
+                  ),
                 ),
-                Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.shopping_cart, color: Colors.blue),
-                      onPressed: () => _addToCart(item['guitarId']),
-                      tooltip: 'Add to cart',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.favorite, color: Colors.red),
-                      onPressed: () => _removeFromWishlist(item['guitarId']),
-                      tooltip: 'Remove from favorites',
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         );
