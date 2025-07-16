@@ -162,7 +162,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 200,
+              height: 160,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -220,8 +220,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildProductCard(Map<String, String> product) {
     return Container(
-      width: 170,
-      margin: const EdgeInsets.only(right: 16),
+      width: 140,
+      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF232946),
         borderRadius: BorderRadius.circular(20),
@@ -234,6 +234,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
@@ -243,13 +244,13 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Image.asset(
               product['image']!,
-              height: 80,
-              width: 170,
+              height: 50,
+              width: 140,
               fit: BoxFit.cover,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(3.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -257,19 +258,19 @@ class _HomePageState extends State<HomePage> {
                   product['name'] ?? '',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 13,
                     color: Colors.white,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 if (product['brand'] != null)
                   Text(
                     product['brand']!,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: const TextStyle(color: Colors.white70, fontSize: 10),
                   ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 2),
                 Row(
                   children: [
                     Text(
@@ -277,42 +278,35 @@ class _HomePageState extends State<HomePage> {
                       style: const TextStyle(
                         color: Color(0xFFB799FF),
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontSize: 12,
                       ),
                     ),
-                    const Spacer(),
-                    if (product['rating'] != null)
-                      Row(
-                        children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                          const SizedBox(width: 2),
-                          Text(
-                            product['rating']!,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8F43EE),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 4),
+                Flexible(
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 24,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8F43EE),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.zero,
+                        elevation: 1,
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                      onPressed: () {},
+                      child: const Text(
+                        'Buy',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    onPressed: () {},
-                    child: const Text('Buy Now'),
                   ),
                 ),
               ],
