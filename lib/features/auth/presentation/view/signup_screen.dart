@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/network/api_service.dart';
 
 class SignupScreen extends StatefulWidget {

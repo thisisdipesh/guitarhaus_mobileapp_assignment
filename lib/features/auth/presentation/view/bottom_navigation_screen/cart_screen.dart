@@ -55,7 +55,7 @@ class _CartScreenState extends State<CartScreen> {
           isLoading = false;
         });
       }
-    } on DioException catch (e) {
+    } on DioException {
       setState(() {
         errorMessage = 'Failed to load cart';
         isLoading = false;

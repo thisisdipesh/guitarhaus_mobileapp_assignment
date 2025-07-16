@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dio/dio.dart';
 import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 
 void main() {
