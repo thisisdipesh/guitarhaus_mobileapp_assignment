@@ -59,7 +59,7 @@ exports.getGuitars = asyncHandler(async (req, res, next) => {
 
   query = query.skip(startIndex).limit(limit);
 
-  const guitars = await query.populate('reviews');
+  const guitars = await query;
 
   // Pagination result
   const pagination = {};
