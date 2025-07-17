@@ -40,6 +40,9 @@ const guitarSchema = new mongoose.Schema(
       type: String, 
       required: true 
     }],
+    imageData: {
+      type: Buffer
+    },
     specifications: {
       body: { type: String },
       neck: { type: String },
