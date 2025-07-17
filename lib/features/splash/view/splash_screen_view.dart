@@ -6,6 +6,7 @@ import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view_
 import 'package:guitarhaus_mobileapp_assignment/features/home/view/HomePage.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/home/view_model/homepage_viewmodel.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/splash/splash_viewmodel.dart/splash_viewmodel.dart';
+import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/dashboard_screen.dart';
 
 class SplashScreenView extends StatefulWidget {
   const SplashScreenView({super.key});
@@ -28,21 +29,17 @@ class _SplashScreenViewState extends State<SplashScreenView> {
         if (state == SplashState.navigateToHome) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider<HomeViewModel>(
-                create: (_) => serviceLocator<HomeViewModel>(),
-                child: const HomePage(),
-              ),
-            ),
+            MaterialPageRoute(builder: (_) => const DashboardScreen()),
           );
         } else if (state == SplashState.navigateToLogin) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => BlocProvider<LoginViewModel>(
-                create: (_) => serviceLocator<LoginViewModel>(),
-                child: LoginScreen(),
-              ),
+              builder:
+                  (_) => BlocProvider<LoginViewModel>(
+                    create: (_) => serviceLocator<LoginViewModel>(),
+                    child: LoginScreen(),
+                  ),
             ),
           );
         }
