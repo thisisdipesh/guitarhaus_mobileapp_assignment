@@ -50,6 +50,7 @@ dependencies:
   awesome_dio_interceptor: ^1.3.0
   json_annotation: ^4.9.0
   shared_preferences: ^2.5.3
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_native_splash: ^2.3.5
