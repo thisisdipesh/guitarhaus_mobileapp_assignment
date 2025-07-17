@@ -93,7 +93,8 @@ exports.getGuitars = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/guitars/:id
 // @access  Public
 exports.getGuitar = asyncHandler(async (req, res, next) => {
-  const guitar = await Guitar.findById(req.params.id).populate('reviews');
+  // Exclude imageData from the response
+  const guitar = await Guitar.findById(req.params.id).select('-imageData').populate('reviews');
 
   if (!guitar) {
     return res.status(404).json({ 
