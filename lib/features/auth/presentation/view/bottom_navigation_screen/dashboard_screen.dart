@@ -620,234 +620,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget body;
+    switch (currentIndex) {
+      case 0:
+        body = const HomePage();
+        break;
+      case 1:
+        body = const FavoritesScreen();
+        break;
+      case 2:
+        body = guitarsPage;
+        break;
+      case 3:
+        body = const CartScreen();
+        break;
+      case 4:
+        body = const ProfileScreen();
+        break;
+      default:
+        body = guitarsPage;
+    }
     return Scaffold(
-      backgroundColor: const Color(0xFF18122B), // Modern dark background
-      resizeToAvoidBottomInset: false, // Prevent bottom overflow
-      drawer: Drawer(
-        child: Stack(
-          children: [
-            // Gradient background
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF18122B), Color(0xFF8F43EE)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-            ),
-            ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                DrawerHeader(
-                  decoration: const BoxDecoration(color: Colors.transparent),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.deepPurpleAccent.withOpacity(0.4),
-                              blurRadius: 24,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/image/guitarhaus.png',
-                          height: 48,
-                          errorBuilder:
-                              (context, error, stackTrace) => const Icon(
-                                Icons.music_note,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'GuitarHaus',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Ubuntu',
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Menu',
-                        style: TextStyle(color: Colors.white70, fontSize: 15),
-                      ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.queue_music,
-                    color: Color(0xFFB799FF),
-                  ),
-                  title: const Text(
-                    'Guitars',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      currentIndex = 2;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.favorite, color: Color(0xFFB799FF)),
-                  title: const Text(
-                    'Favorites',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      currentIndex = 1;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.reviews, color: Color(0xFFB799FF)),
-                  title: const Text(
-                    'Reviews',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder:
-                          (context) => AlertDialog(
-                            backgroundColor: const Color(0xFF232946),
-                            title: const Text(
-                              'Reviews',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            content: const Text(
-                              'Reviews section coming soon!',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text(
-                                  'Close',
-                                  style: TextStyle(color: Color(0xFFB799FF)),
-                                ),
-                              ),
-                            ],
-                          ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.shopping_cart,
-                    color: Color(0xFFB799FF),
-                  ),
-                  title: const Text(
-                    'Cart',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      currentIndex = 3;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.person, color: Color(0xFFB799FF)),
-                  title: const Text(
-                    'Profile',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      currentIndex = 4;
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                const Divider(
-                  color: Colors.white24,
-                  thickness: 1,
-                  indent: 16,
-                  endIndent: 16,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.redAccent),
-                  title: const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.redAccent),
-                  ),
-                  onTap: _logout,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF8F43EE),
-        elevation: 0,
-        leading: Builder(
-          builder:
-              (context) => IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
-        ),
-        title: Row(
-          children: [
-            Image.asset('assets/image/guitarhaus.png', height: 38),
-            const SizedBox(width: 10),
-            const Text(
-              'Guitarhaus',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: _getBody(),
+      backgroundColor: const Color(0xFF18122B),
+      body: body,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        selectedItemColor: const Color(0xFF8F43EE),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
             currentIndex = index;
           });
         },
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: "Favorites",
+            icon: Icon(Icons.favorite),
+            label: "Favorite",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.queue_music),
-            label: "Guitars",
+            label: "Guitar",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: Icon(Icons.shopping_cart),
             label: "Cart",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: "Profile",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
     );
