@@ -22,6 +22,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? guitarsError;
   final ApiService _apiService = ApiService();
 
+  // Add this to the _DashboardScreenState class:
+  Set<String> favoriteGuitarIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -250,6 +253,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 ),
                                               ),
                                             ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          IconButton(
+                                            icon: Icon(
+                                              favoriteGuitarIds.contains(
+                                                    guitar['id'],
+                                                  )
+                                                  ? Icons.favorite
+                                                  : Icons.favorite_border,
+                                              color:
+                                                  favoriteGuitarIds.contains(
+                                                        guitar['id'],
+                                                      )
+                                                      ? Colors.redAccent
+                                                      : Color(0xFFB799FF),
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                if (favoriteGuitarIds.contains(
+                                                  guitar['id'],
+                                                )) {
+                                                  favoriteGuitarIds.remove(
+                                                    guitar['id'],
+                                                  );
+                                                } else {
+                                                  favoriteGuitarIds.add(
+                                                    guitar['id'],
+                                                  );
+                                                }
+                                              });
+                                            },
+                                            tooltip:
+                                                favoriteGuitarIds.contains(
+                                                      guitar['id'],
+                                                    )
+                                                    ? 'Remove from favorites'
+                                                    : 'Add to favorites',
                                           ),
                                           const SizedBox(width: 8),
                                           AnimatedScale(
