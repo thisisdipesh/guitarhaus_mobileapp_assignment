@@ -12,7 +12,10 @@ exports.getGuitars = asyncHandler(async (req, res, next) => {
   const endIndex = page * limit;
   const total = await Guitar.countDocuments();
 
-  let query = Guitar.find();
+  // Only select fields needed for the list (exclude imageData)
+  let query = Guitar.find({}, {
+    imageData: 0 // Exclude imageData field
+  });
 
   // Filter by category
   if (req.query.category) {

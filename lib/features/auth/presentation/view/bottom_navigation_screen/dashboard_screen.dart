@@ -5,6 +5,7 @@ import 'profile_screen.dart';
 import '../../../../home/view/HomePage.dart';
 import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 import 'dart:ui';
+import 'package:dio/dio.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -37,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       guitarsError = null;
     });
     try {
-      final response = await _apiService.getGuitars();
+      final response = await _apiService.getGuitars(limit: 1000);
       print('GUITARS API RESPONSE: ' + response.data.toString());
       if (response.statusCode == 200) {
         final items = response.data['data'] as List;
@@ -60,13 +61,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       } else {
         setState(() {
-          guitarsError = 'Failed to load guitars.';
+          guitarsError = 'Failed to load guitars: ${response.statusMessage}';
           isGuitarsLoading = false;
         });
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      print('DioException: ' + e.toString());
       setState(() {
-        guitarsError = 'Network error.';
+        guitarsError = 'Network error';
+        isGuitarsLoading = false;
+      });
+    } catch (e, stack) {
+      print('Unexpected error in _fetchGuitars: ' + e.toString());
+      print(stack);
+      setState(() {
+        guitarsError = 'Unexpected error: ' + e.toString();
         isGuitarsLoading = false;
       });
     }
@@ -146,140 +155,138 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ),
                             // Details and Actions
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 18,
-                                  horizontal: 8,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      guitar['name'],
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                        fontFamily: 'Ubuntu-Bold',
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 18,
+                                horizontal: 8,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    guitar['name'],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      fontFamily: 'Ubuntu-Bold',
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    guitar['brand'] ?? '',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 15,
+                                      fontFamily: 'Ubuntu-Italic',
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.queue_music,
+                                        color: Color(0xFFB799FF),
+                                        size: 16,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      guitar['brand'] ?? '',
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 15,
-                                        fontFamily: 'Ubuntu-Italic',
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        guitar['category'] ?? '',
+                                        style: const TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 13,
+                                        ),
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.queue_music,
-                                          color: Color(0xFFB799FF),
-                                          size: 16,
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '\u20B9${guitar['price']}',
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFD700),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                          fontFamily: 'Ubuntu-Bold',
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          guitar['category'] ?? '',
-                                          style: const TextStyle(
-                                            color: Colors.white54,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          '\u20B9${guitar['price']}',
-                                          style: const TextStyle(
-                                            color: Color(0xFFFFD700),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                            fontFamily: 'Ubuntu-Bold',
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        IconButton(
-                                          icon: Icon(
-                                            favoriteGuitarIds.contains(
-                                                  guitar['id'],
-                                                )
-                                                ? Icons.favorite
-                                                : Icons.favorite_border,
-                                            color:
-                                                favoriteGuitarIds.contains(
-                                                      guitar['id'],
-                                                    )
-                                                    ? Colors.redAccent
-                                                    : Color(0xFFB799FF),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              if (favoriteGuitarIds.contains(
+                                      ),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        icon: Icon(
+                                          favoriteGuitarIds.contains(
                                                 guitar['id'],
-                                              )) {
-                                                favoriteGuitarIds.remove(
-                                                  guitar['id'],
-                                                );
-                                              } else {
-                                                favoriteGuitarIds.add(
-                                                  guitar['id'],
-                                                );
-                                              }
-                                            });
-                                          },
-                                          tooltip:
+                                              )
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color:
                                               favoriteGuitarIds.contains(
                                                     guitar['id'],
                                                   )
-                                                  ? 'Remove from favorites'
-                                                  : 'Add to favorites',
+                                                  ? Colors.redAccent
+                                                  : Color(0xFFB799FF),
                                         ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.shopping_cart,
-                                            color: Color(0xFF8F43EE),
-                                          ),
-                                          onPressed: () {
-                                            ScaffoldMessenger.of(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (favoriteGuitarIds.contains(
+                                              guitar['id'],
+                                            )) {
+                                              favoriteGuitarIds.remove(
+                                                guitar['id'],
+                                              );
+                                            } else {
+                                              favoriteGuitarIds.add(
+                                                guitar['id'],
+                                              );
+                                            }
+                                          });
+                                        },
+                                        tooltip:
+                                            favoriteGuitarIds.contains(
+                                                  guitar['id'],
+                                                )
+                                                ? 'Remove from favorites'
+                                                : 'Add to favorites',
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.shopping_cart,
+                                          color: Color(0xFF8F43EE),
+                                        ),
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Added to cart!'),
+                                              backgroundColor: Color(
+                                                0xFF8F43EE,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        tooltip: 'Add to cart',
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.visibility,
+                                          color: Color(0xFFB799FF),
+                                        ),
+                                        onPressed:
+                                            () => _showQuickView(
                                               context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Added to cart!'),
-                                                backgroundColor: Color(
-                                                  0xFF8F43EE,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          tooltip: 'Add to cart',
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.visibility,
-                                            color: Color(0xFFB799FF),
-                                          ),
-                                          onPressed:
-                                              () => _showQuickView(
-                                                context,
-                                                guitar,
-                                                index,
-                                              ),
-                                          tooltip: 'Quick view',
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                              guitar,
+                                              index,
+                                            ),
+                                        tooltip: 'Quick view',
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ],

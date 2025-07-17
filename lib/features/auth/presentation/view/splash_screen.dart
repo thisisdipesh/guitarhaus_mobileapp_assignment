@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart'; // Or change to 'home_screen.dart' if going to home directly
 import 'dart:ui';
-import 'dart:math';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
