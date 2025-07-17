@@ -138,15 +138,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
-            const Icon(Icons.star, color: Color(0xFFB799FF), size: 26),
+            // Guitar pick icon for theme
+            const Icon(Icons.music_note, color: Color(0xFFFFD700), size: 28),
             const SizedBox(width: 8),
             const Text(
               'Favorites',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 26,
                 fontFamily: 'Ubuntu-Bold',
                 letterSpacing: 1.2,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -171,7 +173,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Failed to clear: ${e.response?.data['message'] ?? 'Error'}',
+                        'Failed to clear: \\${e.response?.data['message'] ?? 'Error'}',
                       ),
                       backgroundColor: Colors.red,
                     ),
@@ -184,7 +186,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
       body: Stack(
         children: [
-          // Gradient background
+          // Modern gradient background with subtle guitar overlay
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -193,6 +195,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 colors: [Color(0xFF18122B), Color(0xFF8F43EE)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
+              ),
+            ),
+            child: Opacity(
+              opacity: 0.08,
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Icon(Icons.music_note, size: 220, color: Colors.white),
               ),
             ),
           ),
@@ -207,54 +216,139 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           (context, index) => const SizedBox(height: 18),
                       itemBuilder: (context, index) {
                         final guitar = favoriteGuitars[index];
-                        return Card(
-                          color: const Color(0xFF232946),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                'http://10.0.2.2:3000/api/v1/guitars/${guitar['id']}/image',
-                                width: 54,
-                                height: 54,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (context, error, stackTrace) => Container(
-                                      width: 54,
-                                      height: 54,
-                                      color: Colors.grey[300],
-                                      child: const Icon(
-                                        Icons.image,
-                                        size: 32,
-                                        color: Colors.grey,
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.13),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: Color(0xFFB799FF),
+                                  width: 1.2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.08),
+                                    blurRadius: 16,
+                                    offset: Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 12,
+                                ),
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.network(
+                                    'http://10.0.2.2:3000/api/v1/guitars/${guitar['id']}/image',
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.image,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                                title: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.queue_music,
+                                      color: Color(0xFFFFD700),
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        guitar['name'],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          fontFamily: 'Ubuntu-Bold',
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                              ),
-                            ),
-                            title: Text(
-                              guitar['name'],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17,
-                                fontFamily: 'Ubuntu',
-                              ),
-                            ),
-                            subtitle: Text(
-                              guitar['brand'] ?? '',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 13,
-                              ),
-                            ),
-                            trailing: Text(
-                              '\u20B9${guitar['price']}',
-                              style: const TextStyle(
-                                color: Color(0xFFB799FF),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
+                                  ],
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      guitar['brand'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 15,
+                                        fontFamily: 'Ubuntu-Italic',
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.star,
+                                          color: Color(0xFFFFD700),
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          guitar['rating'].toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          '\u20B9${guitar['price']}',
+                                          style: const TextStyle(
+                                            color: Color(0xFFB799FF),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                trailing: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.favorite,
+                                        color: Colors.redAccent,
+                                      ),
+                                      tooltip: 'Remove from favorites',
+                                      onPressed:
+                                          () => context
+                                              .read<FavoritesProvider>()
+                                              .removeFavorite(guitar['id']),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.add_shopping_cart,
+                                        color: Color(0xFF8F43EE),
+                                      ),
+                                      tooltip: 'Add to cart',
+                                      onPressed: () => _addToCart(guitar['id']),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -268,54 +362,55 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Widget _buildEmptyWishlist() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 40),
-        const Icon(Icons.star_border, color: Color(0xFFB799FF), size: 80),
-        const SizedBox(height: 20),
-        const Text(
-          "No favorites",
-          style: TextStyle(
-            fontSize: 22,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Ubuntu-Bold',
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          "Your favorite guitars will appear here.",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.white70,
-            fontFamily: 'Ubuntu-italic',
-          ),
-        ),
-        const SizedBox(height: 40),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF8F43EE),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-          icon: const Icon(Icons.explore, color: Colors.white),
-          label: const Text(
-            "Browse Guitars",
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.music_note, color: Color(0xFF8F43EE), size: 90),
+          const SizedBox(height: 24),
+          const Text(
+            "No favorite guitars yet!",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 24,
               color: Colors.white,
+              fontWeight: FontWeight.bold,
               fontFamily: 'Ubuntu-Bold',
             ),
           ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/dashboard');
-          },
-        ),
-      ],
+          const SizedBox(height: 10),
+          const Text(
+            "Tap the heart icon on a guitar to add it to your favorites.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
+              fontFamily: 'Ubuntu-Italic',
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFD700),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            icon: const Icon(Icons.explore, color: Color(0xFF232946)),
+            label: const Text(
+              "Browse Guitars",
+              style: TextStyle(
+                fontSize: 18,
+                color: Color(0xFF232946),
+                fontFamily: 'Ubuntu-Bold',
+              ),
+            ),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/dashboard');
+            },
+          ),
+        ],
+      ),
     );
   }
 
