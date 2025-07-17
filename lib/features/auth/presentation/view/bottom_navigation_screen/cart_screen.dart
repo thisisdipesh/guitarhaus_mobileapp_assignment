@@ -20,16 +20,16 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeAuthToken();
-    _loadCart();
+    _initializeAuthTokenAndLoadCart();
   }
 
-  Future<void> _initializeAuthToken() async {
+  Future<void> _initializeAuthTokenAndLoadCart() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token != null) {
       _apiService.setAuthToken(token);
     }
+    await _loadCart();
   }
 
   Future<void> _loadCart() async {
@@ -38,19 +38,25 @@ class _CartScreenState extends State<CartScreen> {
       if (response.statusCode == 200) {
         final cartData = response.data['data'];
         final items = cartData['items'] as List;
-        
+
         setState(() {
-          cartItems = items.map((item) => {
-            "id": item['_id'],
-            "guitarId": item['guitar']['_id'],
-            "name": item['guitar']['name'],
-            "brand": item['guitar']['brand'],
-            "price": item['price'].toDouble(),
-            "quantity": item['quantity'],
-            "image": item['guitar']['images']?.isNotEmpty == true 
-                ? item['guitar']['images'][0] 
-                : "assets/image/bass_guitar.jpg",
-          }).toList();
+          cartItems =
+              items
+                  .map(
+                    (item) => {
+                      "id": item['_id'],
+                      "guitarId": item['guitar']['_id'],
+                      "name": item['guitar']['name'],
+                      "brand": item['guitar']['brand'],
+                      "price": item['price'].toDouble(),
+                      "quantity": item['quantity'],
+                      "image":
+                          item['guitar']['images']?.isNotEmpty == true
+                              ? item['guitar']['images'][0]
+                              : "assets/image/bass_guitar.jpg",
+                    },
+                  )
+                  .toList();
           totalAmount = cartData['totalAmount']?.toDouble() ?? 0.0;
           isLoading = false;
         });
@@ -75,7 +81,9 @@ class _CartScreenState extends State<CartScreen> {
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update quantity: ${e.response?.data['message'] ?? 'Error'}'),
+          content: Text(
+            'Failed to update quantity: ${e.response?.data['message'] ?? 'Error'}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -97,7 +105,9 @@ class _CartScreenState extends State<CartScreen> {
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to remove item: ${e.response?.data['message'] ?? 'Error'}'),
+          content: Text(
+            'Failed to remove item: ${e.response?.data['message'] ?? 'Error'}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -119,7 +129,9 @@ class _CartScreenState extends State<CartScreen> {
     } on DioException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to clear cart: ${e.response?.data['message'] ?? 'Error'}'),
+          content: Text(
+            'Failed to clear cart: ${e.response?.data['message'] ?? 'Error'}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -141,7 +153,11 @@ class _CartScreenState extends State<CartScreen> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
-            const Icon(Icons.shopping_cart, color: Colors.greenAccent, size: 24),
+            const Icon(
+              Icons.shopping_cart,
+              color: Colors.greenAccent,
+              size: 24,
+            ),
             const SizedBox(width: 8),
             const Text(
               'Cart',
@@ -164,13 +180,14 @@ class _CartScreenState extends State<CartScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : cartItems.isEmpty
+        child:
+            isLoading
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                : cartItems.isEmpty
                 ? _buildEmptyCart()
                 : _buildCartItems(),
       ),
@@ -182,7 +199,11 @@ class _CartScreenState extends State<CartScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 40),
-        const Icon(Icons.remove_shopping_cart, color: Colors.greenAccent, size: 80),
+        const Icon(
+          Icons.remove_shopping_cart,
+          color: Colors.greenAccent,
+          size: 80,
+        ),
         const SizedBox(height: 20),
         const Text(
           "The Cart is Empty",
@@ -250,12 +271,17 @@ class _CartScreenState extends State<CartScreen> {
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.image, size: 40, color: Colors.grey),
-                          ),
+                          errorBuilder:
+                              (context, error, stackTrace) => Container(
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[300],
+                                child: const Icon(
+                                  Icons.image,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                              ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -293,10 +319,15 @@ class _CartScreenState extends State<CartScreen> {
                                 Row(
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.remove_circle_outline),
+                                      icon: const Icon(
+                                        Icons.remove_circle_outline,
+                                      ),
                                       onPressed: () {
                                         if (item['quantity'] > 1) {
-                                          _updateQuantity(item['id'], item['quantity'] - 1);
+                                          _updateQuantity(
+                                            item['id'],
+                                            item['quantity'] - 1,
+                                          );
                                         }
                                       },
                                     ),
@@ -308,9 +339,14 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.add_circle_outline),
+                                      icon: const Icon(
+                                        Icons.add_circle_outline,
+                                      ),
                                       onPressed: () {
-                                        _updateQuantity(item['id'], item['quantity'] + 1);
+                                        _updateQuantity(
+                                          item['id'],
+                                          item['quantity'] + 1,
+                                        );
                                       },
                                     ),
                                   ],
@@ -344,10 +380,7 @@ class _CartScreenState extends State<CartScreen> {
                 children: [
                   const Text(
                     'Total:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     '\$${totalAmount.toStringAsFixed(2)}',
