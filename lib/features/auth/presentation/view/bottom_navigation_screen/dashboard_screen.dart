@@ -8,6 +8,7 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // Removed unused or problematic imports
 
 class DashboardScreen extends StatefulWidget {
@@ -29,7 +30,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeAuthToken();
     _fetchGuitars();
+  }
+
+  Future<void> _initializeAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      _apiService.setAuthToken(token);
+    }
   }
 
   Future<void> _fetchGuitars() async {
@@ -257,17 +267,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           Icons.shopping_cart,
                                           color: Color(0xFF8F43EE),
                                         ),
-                                        onPressed: () {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Added to cart!'),
-                                              backgroundColor: Color(
-                                                0xFF8F43EE,
-                                              ),
-                                            ),
-                                          );
+                                        onPressed: () async {
+                                          try {
+                                            final response = await _apiService
+                                                .addToCart(guitar['id'], 1);
+                                            print(
+                                              'Add to cart response: ${response.data}',
+                                            );
+                                            if (response.statusCode == 200 ||
+                                                response.statusCode == 201) {
+                                              if (mounted) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (context) =>
+                                                            const CartScreen(),
+                                                  ),
+                                                );
+                                              }
+                                            } else {
+                                              if (mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Failed to add to cart: '
+                                                      '${response.data['message'] ?? 'Unknown error'}',
+                                                    ),
+                                                    backgroundColor:
+                                                        const Color(0xFFB799FF),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          } catch (e) {
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Failed to add to cart!',
+                                                  ),
+                                                  backgroundColor: Color(
+                                                    0xFFB799FF,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
                                         },
                                         tooltip: 'Add to cart',
                                       ),
