@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'guitar_screen.dart';
 // Removed unused or problematic imports
 
 class DashboardScreen extends StatefulWidget {
@@ -629,7 +630,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body = const FavoritesScreen();
         break;
       case 2:
-        body = guitarsPage;
+        body = const GuitarScreen();
         break;
       case 3:
         body = const CartScreen();
@@ -638,7 +639,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body = const ProfileScreen();
         break;
       default:
-        body = guitarsPage;
+        body = const GuitarScreen();
     }
     return Scaffold(
       backgroundColor: const Color(0xFF18122B),
