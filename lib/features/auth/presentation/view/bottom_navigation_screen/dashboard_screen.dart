@@ -93,234 +93,201 @@ class _DashboardScreenState extends State<DashboardScreen> {
           )
           : SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 20, 12, 32),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: GridView.builder(
-                      padding: EdgeInsets.zero,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 24,
-                            mainAxisSpacing: 24,
-                            childAspectRatio: 0.68, // Slightly taller cards
-                          ),
-                      itemCount: guitars.length,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final guitar = guitars[index];
-                        return Container(
-                          margin: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(32),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            border: Border.all(
-                              color: Color(0xFF8F43EE),
-                              width: 2.2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF8F43EE).withOpacity(0.10),
-                                blurRadius: 18,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(32),
-                            child: Stack(
-                              children: [
-                                BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 10,
-                                    sigmaY: 10,
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.06),
-                                      borderRadius: BorderRadius.circular(32),
+              padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+              child: ListView.separated(
+                itemCount: guitars.length,
+                separatorBuilder:
+                    (context, index) => const SizedBox(height: 18),
+                itemBuilder: (context, index) {
+                  final guitar = guitars[index];
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Guitar Image
+                            Container(
+                              width: 110,
+                              height: 110,
+                              margin: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.deepPurpleAccent.withOpacity(
+                                      0.18,
                                     ),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 4),
                                   ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: _buildGuitarImage(guitar),
+                              ),
+                            ),
+                            // Details and Actions
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                  horizontal: 8,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical:
-                                        10, // Slightly reduced vertical padding
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            18,
-                                          ),
-                                          child: _buildGuitarImage(guitar),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      guitar['name'],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                        fontFamily: 'Ubuntu-Bold',
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      guitar['brand'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 15,
+                                        fontFamily: 'Ubuntu-Italic',
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.queue_music,
+                                          color: Color(0xFFB799FF),
+                                          size: 16,
                                         ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        guitar['name'],
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17,
-                                          fontFamily: 'Times New Roman',
-                                          letterSpacing: 0.5,
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          guitar['category'] ?? '',
+                                          style: const TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 13,
+                                          ),
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        guitar['brand'] ?? '',
-                                        style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 13,
-                                          fontFamily: 'Ubuntu-Italic',
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '\u20B9${guitar['price']}',
+                                          style: const TextStyle(
+                                            color: Color(0xFFFFD700),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                            fontFamily: 'Ubuntu-Bold',
+                                          ),
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.queue_music,
-                                            color: Color(0xFFB799FF),
-                                            size: 15,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            guitar['category'] ?? '',
-                                            style: const TextStyle(
-                                              color: Colors.white54,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(
-                                                  0xFF8F43EE,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(14),
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 8,
-                                                    ),
-                                              ),
-                                              onPressed: () {
-                                                // TODO: Implement add to cart logic
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'Added to cart!',
-                                                    ),
-                                                    backgroundColor: Color(
-                                                      0xFF8F43EE,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: const Text(
-                                                'Add to Cart',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          IconButton(
-                                            icon: Icon(
-                                              favoriteGuitarIds.contains(
-                                                    guitar['id'],
-                                                  )
-                                                  ? Icons.favorite
-                                                  : Icons.favorite_border,
-                                              color:
-                                                  favoriteGuitarIds.contains(
-                                                        guitar['id'],
-                                                      )
-                                                      ? Colors.redAccent
-                                                      : Color(0xFFB799FF),
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                if (favoriteGuitarIds.contains(
+                                        const Spacer(),
+                                        IconButton(
+                                          icon: Icon(
+                                            favoriteGuitarIds.contains(
                                                   guitar['id'],
-                                                )) {
-                                                  favoriteGuitarIds.remove(
-                                                    guitar['id'],
-                                                  );
-                                                } else {
-                                                  favoriteGuitarIds.add(
-                                                    guitar['id'],
-                                                  );
-                                                }
-                                              });
-                                            },
-                                            tooltip:
+                                                )
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            color:
                                                 favoriteGuitarIds.contains(
                                                       guitar['id'],
                                                     )
-                                                    ? 'Remove from favorites'
-                                                    : 'Add to favorites',
+                                                    ? Colors.redAccent
+                                                    : Color(0xFFB799FF),
                                           ),
-                                          const SizedBox(width: 8),
-                                          AnimatedScale(
-                                            scale: 1.0,
-                                            duration: const Duration(
-                                              milliseconds: 200,
-                                            ),
-                                            child: _ShimmerIconButton(
-                                              icon: Icons.visibility,
-                                              color: Color(0xFFB799FF),
-                                              onTap:
-                                                  () => _showQuickView(
-                                                    context,
-                                                    guitar,
-                                                    index,
-                                                  ),
-                                            ),
+                                          onPressed: () {
+                                            setState(() {
+                                              if (favoriteGuitarIds.contains(
+                                                guitar['id'],
+                                              )) {
+                                                favoriteGuitarIds.remove(
+                                                  guitar['id'],
+                                                );
+                                              } else {
+                                                favoriteGuitarIds.add(
+                                                  guitar['id'],
+                                                );
+                                              }
+                                            });
+                                          },
+                                          tooltip:
+                                              favoriteGuitarIds.contains(
+                                                    guitar['id'],
+                                                  )
+                                                  ? 'Remove from favorites'
+                                                  : 'Add to favorites',
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.shopping_cart,
+                                            color: Color(0xFF8F43EE),
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                          onPressed: () {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Added to cart!'),
+                                                backgroundColor: Color(
+                                                  0xFF8F43EE,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          tooltip: 'Add to cart',
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.visibility,
+                                            color: Color(0xFFB799FF),
+                                          ),
+                                          onPressed:
+                                              () => _showQuickView(
+                                                context,
+                                                guitar,
+                                                index,
+                                              ),
+                                          tooltip: 'Quick view',
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           );
