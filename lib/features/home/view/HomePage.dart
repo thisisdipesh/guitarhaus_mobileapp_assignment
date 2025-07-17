@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,19 +10,61 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Dummy featured products
-  final List<Map<String, String>> featuredProducts = [
-    {
-      'name': 'Fender Stratocaster',
-      'image': 'assets/image/electirc_guitar.jpeg',
-      'price': ' 2,499',
-    },
-    {
-      'name': 'Gibson Les Paul',
-      'image': 'assets/image/bass_guitar.jpg',
-      'price': ' 3,199',
-    },
-  ];
+  // Remove guitars state, _fetchGuitars, and any guitar list UI from HomePage
+  final ApiService _apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    // _fetchGuitars(); // This line is removed
+  }
+
+  // Future<void> _fetchGuitars() async { // This function is removed
+  //   setState(() {
+  //     isGuitarsLoading = true;
+  //     guitarsError = null;
+  //   });
+  //   try {
+  //     final response = await _apiService.getGuitars(limit: 1000);
+  //     print('HOMEPAGE GUITARS API RESPONSE: ' + response.data.toString());
+  //     if (response.statusCode == 200) {
+  //       final items = response.data['data'] as List;
+  //       setState(() {
+  //         guitars =
+  //             items
+  //                 .map(
+  //                   (g) => {
+  //                     'id': g['_id'],
+  //                     'name': g['name'],
+  //                     'brand': g['brand'],
+  //                     'price': g['price'].toString(),
+  //                     'category': g['category'],
+  //                   },
+  //                 )
+  //                 .toList();
+  //         isGuitarsLoading = false;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         guitarsError = 'Failed to load guitars: \\${response.statusMessage}';
+  //         isGuitarsLoading = false;
+  //       });
+  //     }
+  //   } on DioException catch (e) {
+  //     print('DioException: ' + e.toString());
+  //     setState(() {
+  //       guitarsError = 'Network error: ' + (e.message ?? e.toString());
+  //       isGuitarsLoading = false;
+  //     });
+  //   } catch (e, stack) {
+  //     print('Unexpected error in _fetchGuitars: ' + e.toString());
+  //     print(stack);
+  //     setState(() {
+  //       guitarsError = 'Unexpected error: ' + e.toString();
+  //       isGuitarsLoading = false;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +196,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Text(
-                'Featured Products',
+                'All Guitars',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -161,18 +205,86 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 160,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: featuredProducts.length,
-                itemBuilder: (context, index) {
-                  final product = featuredProducts[index];
-                  return _buildProductCard(product);
-                },
-              ),
-            ),
+            // isGuitarsLoading // This line is removed
+            //     ? const Center( // This line is removed
+            //       child: CircularProgressIndicator(color: Color(0xFFB799FF)), // This line is removed
+            //     ) // This line is removed
+            //     : guitarsError != null // This line is removed
+            //     ? Center( // This line is removed
+            //       child: Text( // This line is removed
+            //         guitarsError!, // This line is removed
+            //         style: const TextStyle(color: Colors.white70), // This line is removed
+            //       ), // This line is removed
+            //     ) // This line is removed
+            //     : ListView.separated( // This line is removed
+            //       shrinkWrap: true, // This line is removed
+            //       physics: const NeverScrollableScrollPhysics(), // This line is removed
+            //       itemCount: guitars.length, // This line is removed
+            //       separatorBuilder: // This line is removed
+            //           (context, index) => const SizedBox(height: 18), // This line is removed
+            //       itemBuilder: (context, index) { // This line is removed
+            //         final guitar = guitars[index]; // This line is removed
+            //         return Container( // This line is removed
+            //           margin: const EdgeInsets.symmetric(horizontal: 16), // This line is removed
+            //           decoration: BoxDecoration( // This line is removed
+            //             borderRadius: BorderRadius.circular(20), // This line is removed
+            //             color: const Color(0xFF232946), // This line is removed
+            //             boxShadow: [ // This line is removed
+            //               BoxShadow( // This line is removed
+            //                 color: Colors.black26, // This line is removed
+            //                 blurRadius: 12, // This line is removed
+            //                 offset: Offset(0, 6), // This line is removed
+            //               ), // This line is removed
+            //             ], // This line is removed
+            //           ), // This line is removed
+            //           child: ListTile( // This line is removed
+            //             leading: ClipRRect( // This line is removed
+            //               borderRadius: BorderRadius.circular(12), // This line is removed
+            //               child: Image.network( // This line is removed
+            //                 'http://10.0.2.2:3000/api/v1/guitars/${guitar['id']}/image', // This line is removed
+            //                 width: 54, // This line is removed
+            //                 height: 54, // This line is removed
+            //                 fit: BoxFit.cover, // This line is removed
+            //                 errorBuilder: // This line is removed
+            //                     (context, error, stackTrace) => Container( // This line is removed
+            //                       width: 54, // This line is removed
+            //                       height: 54, // This line is removed
+            //                       color: Colors.grey[300], // This line is removed
+            //                       child: const Icon( // This line is removed
+            //                         Icons.image, // This line is removed
+            //                         size: 32, // This line is removed
+            //                         color: Colors.grey, // This line is removed
+            //                       ), // This line is removed
+            //                     ), // This line is removed
+            //               ), // This line is removed
+            //             ), // This line is removed
+            //             title: Text( // This line is removed
+            //               guitar['name'], // This line is removed
+            //               style: const TextStyle( // This line is removed
+            //                 fontWeight: FontWeight.bold, // This line is removed
+            //                 fontSize: 16, // This line is removed
+            //                 color: Colors.white, // This line is removed
+            //               ), // This line is removed
+            //             ), // This line is removed
+            //             subtitle: Text( // This line is removed
+            //               guitar['brand'] ?? '', // This line is removed
+            //               style: const TextStyle( // This line is removed
+            //                 color: Colors.white70, // This line is removed
+            //                 fontSize: 13, // This line is removed
+            //               ), // This line is removed
+            //             ), // This line is removed
+            //             trailing: Text( // This line is removed
+            //               '\u20B9${guitar['price']}', // This line is removed
+            //               style: const TextStyle( // This line is removed
+            //                 color: Color(0xFFB799FF), // This line is removed
+            //                 fontWeight: FontWeight.bold, // This line is removed
+            //                 fontSize: 15, // This line is removed
+            //               ), // This line is removed
+            //             ), // This line is removed
+            //           ), // This line is removed
+            //         ); // This line is removed
+            //       }, // This line is removed
+            //     ), // This line is removed
             const SizedBox(height: 24),
           ],
         ),
@@ -284,27 +396,25 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Flexible(
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 24,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8F43EE),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: EdgeInsets.zero,
-                        elevation: 1,
+                SizedBox(
+                  width: double.infinity,
+                  height: 24,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF8F43EE),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      onPressed: () {},
-                      child: const Text(
-                        'Buy',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      padding: EdgeInsets.zero,
+                      elevation: 1,
+                    ),
+                    onPressed: () {},
+                    child: const Text(
+                      'Buy',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),

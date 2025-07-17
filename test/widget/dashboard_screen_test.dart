@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/dashboard_screen.dart';
 
 // Mock DashboardScreen for testing that doesn't make HTTP requests
 class MockDashboardScreen extends StatefulWidget {
@@ -17,9 +16,17 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
 
   final List<Map<String, dynamic>> categories = [
     {"icon": Icons.music_note, "label": "Electric", "category": "Electric"},
-    {"icon": Icons.music_note_outlined, "label": "Acoustic", "category": "Acoustic"},
+    {
+      "icon": Icons.music_note_outlined,
+      "label": "Acoustic",
+      "category": "Acoustic",
+    },
     {"icon": Icons.music_note_rounded, "label": "Bass", "category": "Bass"},
-    {"icon": Icons.music_note_sharp, "label": "Classical", "category": "Classical"},
+    {
+      "icon": Icons.music_note_sharp,
+      "label": "Classical",
+      "category": "Classical",
+    },
     {"icon": Icons.music_note, "label": "Ukulele", "category": "Ukulele"},
   ];
 
@@ -31,17 +38,15 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
         backgroundColor: const Color.fromARGB(255, 154, 4, 107),
         elevation: 0,
         leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {},
-          ),
+          builder:
+              (context) => IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () {},
+              ),
         ),
         title: Row(
           children: [
-            Image.asset(
-              'assets/image/guitarhaus.png',
-              height: 38,
-            ),
+            Image.asset('assets/image/guitarhaus.png', height: 38),
             const SizedBox(width: 10),
             const Text(
               'Guitarhaus',
@@ -60,7 +65,11 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
           const SizedBox(height: 10),
           const Text(
             "Welcome to GuitarHaus!",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(height: 16),
           ClipRRect(
@@ -93,7 +102,14 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text("Categories", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            "Categories",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           SizedBox(
             height: 80,
@@ -115,7 +131,10 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
                       const SizedBox(height: 6),
                       Text(
                         cat['label'],
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -127,7 +146,14 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Featured Products", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                "Featured Products",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               if (errorMessage != null)
                 Text(
                   errorMessage!,
@@ -163,9 +189,18 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: "Favorites"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: "Cart"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profile"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_border),
+            label: "Favorites",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart_outlined),
+            label: "Cart",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: "Profile",
+          ),
         ],
       ),
     );
@@ -174,7 +209,9 @@ class _MockDashboardScreenState extends State<MockDashboardScreen> {
 
 void main() {
   group('DashboardScreen Widget Tests', () {
-    testWidgets('should display dashboard with all main components', (WidgetTester tester) async {
+    testWidgets('should display dashboard with all main components', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -184,7 +221,9 @@ void main() {
       expect(find.byType(BottomNavigationBar), findsOneWidget);
     });
 
-    testWidgets('should display bottom navigation with all tabs', (WidgetTester tester) async {
+    testWidgets('should display bottom navigation with all tabs', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -195,7 +234,9 @@ void main() {
       expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
 
-    testWidgets('should show search bar in app bar', (WidgetTester tester) async {
+    testWidgets('should show search bar in app bar', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -204,7 +245,9 @@ void main() {
       expect(find.text('Search guitars...'), findsOneWidget);
     });
 
-    testWidgets('should display featured guitars section', (WidgetTester tester) async {
+    testWidgets('should display featured guitars section', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
       await tester.pumpAndSettle();
@@ -217,7 +260,9 @@ void main() {
       expect(find.text('No featured guitars available'), findsOneWidget);
     });
 
-    testWidgets('should display categories section', (WidgetTester tester) async {
+    testWidgets('should display categories section', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -230,7 +275,9 @@ void main() {
       expect(find.text('Ukulele'), findsOneWidget);
     });
 
-    testWidgets('should navigate to cart when cart icon is tapped', (WidgetTester tester) async {
+    testWidgets('should navigate to cart when cart icon is tapped', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -243,7 +290,9 @@ void main() {
       expect(cartIcon, findsOneWidget);
     });
 
-    testWidgets('should navigate to favorites when favorites icon is tapped', (WidgetTester tester) async {
+    testWidgets('should navigate to favorites when favorites icon is tapped', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -256,7 +305,9 @@ void main() {
       expect(favoritesIcon, findsOneWidget);
     });
 
-    testWidgets('should navigate to profile when profile icon is tapped', (WidgetTester tester) async {
+    testWidgets('should navigate to profile when profile icon is tapped', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -269,7 +320,9 @@ void main() {
       expect(profileIcon, findsOneWidget);
     });
 
-    testWidgets('should have correct app bar styling', (WidgetTester tester) async {
+    testWidgets('should have correct app bar styling', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -279,17 +332,23 @@ void main() {
       expect(appBar.elevation, 0);
     });
 
-    testWidgets('should have correct bottom navigation styling', (WidgetTester tester) async {
+    testWidgets('should have correct bottom navigation styling', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
       // Assert - check bottom navigation properties
-      final bottomNav = tester.widget<BottomNavigationBar>(find.byType(BottomNavigationBar));
+      final bottomNav = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
       expect(bottomNav.type, BottomNavigationBarType.fixed);
       expect(bottomNav.items.length, 4);
     });
 
-    testWidgets('should handle search functionality', (WidgetTester tester) async {
+    testWidgets('should handle search functionality', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -305,7 +364,9 @@ void main() {
       expect(find.text('guitar'), findsOneWidget);
     });
 
-    testWidgets('should display category cards with proper styling', (WidgetTester tester) async {
+    testWidgets('should display category cards with proper styling', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(const MaterialApp(home: MockDashboardScreen()));
 
@@ -349,4 +410,4 @@ void main() {
       expect(find.text('Discover your favorite Guitars items'), findsOneWidget);
     });
   });
-} 
+}
