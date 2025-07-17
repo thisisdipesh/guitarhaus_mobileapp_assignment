@@ -40,20 +40,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final items = response.data['data'] as List;
         setState(() {
           guitars =
-              items
-                  .map(
-                    (g) => {
-                      'name': g['name'],
-                      'brand': g['brand'],
-                      'price': g['price'].toString(),
-                      'image':
-                          g['images']?.isNotEmpty == true
-                              ? g['images'][0]
-                              : 'assets/image/guitarhaus.png',
-                      'category': g['category'],
-                    },
-                  )
-                  .toList();
+              items.map((g) {
+                print('Guitar ID: ' + g['_id'].toString());
+                print(
+                  'Has imageData: ' + (g['imageData'] != null ? 'YES' : 'NO'),
+                );
+                return {
+                  'id': g['_id'],
+                  'name': g['name'],
+                  'brand': g['brand'],
+                  'price': g['price'].toString(),
+                  'category': g['category'],
+                };
+              }).toList();
           isGuitarsLoading = false;
         });
       } else {
@@ -160,23 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           borderRadius: BorderRadius.circular(
                                             18,
                                           ),
-                                          child: Image.asset(
-                                            guitar['image'],
-                                            width: double.infinity,
-                                            height: 70, // Reduced image height
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Container(
-                                                      color: Colors.grey[300],
-                                                      height: 70,
-                                                      child: const Icon(
-                                                        Icons.image,
-                                                        size: 32,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                          ),
+                                          child: _buildGuitarImage(guitar),
                                         ),
                                       ),
                                       const SizedBox(height: 10),
@@ -811,4 +794,46 @@ class _ShimmerIconButton extends StatelessWidget {
       },
     );
   }
+}
+
+Widget _buildGuitarImage(dynamic guitarOrImagePath) {
+  // If a map is passed, extract id
+  String? id;
+  if (guitarOrImagePath is Map && guitarOrImagePath['id'] != null) {
+    id = guitarOrImagePath['id'];
+  } else if (guitarOrImagePath is String) {
+    // fallback for old usage
+    return Image.asset(
+      guitarOrImagePath,
+      width: double.infinity,
+      height: 70,
+      fit: BoxFit.cover,
+      errorBuilder:
+          (context, error, stackTrace) => Container(
+            color: Colors.grey[300],
+            height: 70,
+            child: const Icon(Icons.image, size: 32, color: Colors.grey),
+          ),
+    );
+  }
+  if (id != null) {
+    final url = 'http://10.0.2.2:3000/api/v1/guitars/$id/image';
+    return Image.network(
+      url,
+      width: double.infinity,
+      height: 70,
+      fit: BoxFit.cover,
+      errorBuilder:
+          (context, error, stackTrace) => Container(
+            color: Colors.grey[300],
+            height: 70,
+            child: const Icon(Icons.image, size: 32, color: Colors.grey),
+          ),
+    );
+  }
+  return Container(
+    color: Colors.grey[300],
+    height: 70,
+    child: const Icon(Icons.image, size: 32, color: Colors.grey),
+  );
 }

@@ -232,3 +232,16 @@ exports.searchGuitars = asyncHandler(async (req, res, next) => {
     data: guitars
   });
 }); 
+
+// @desc    Serve guitar image binary data
+// @route   GET /api/v1/guitars/:id/image
+// @access  Public
+exports.getGuitarImage = asyncHandler(async (req, res, next) => {
+  const guitar = await Guitar.findById(req.params.id);
+  if (!guitar || !guitar.imageData) {
+    return res.status(404).json({ success: false, message: 'Image not found' });
+  }
+  // Default to jpeg, you may want to store mime type in the future
+  res.set('Content-Type', 'image/jpeg');
+  res.send(guitar.imageData);
+}); 

@@ -10,7 +10,8 @@ const {
   deleteGuitar,
   getFeaturedGuitars,
   getGuitarsByCategory,
-  searchGuitars
+  searchGuitars,
+  getGuitarImage
 } = require("../controllers/GuitarController");
 
 // Public routes
@@ -19,6 +20,7 @@ router.get("/featured", getFeaturedGuitars);
 router.get("/category/:category", getGuitarsByCategory);
 router.get("/search", searchGuitars);
 router.get("/:id", getGuitar);
+router.get("/:id/image", getGuitarImage);
 
 // Admin only routes
 router.post("/", protect, authorize("admin"), createGuitar);

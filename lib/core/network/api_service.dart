@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.1.82:3000/api/v1';
+  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
   late Dio _dio;
 
   ApiService() {
