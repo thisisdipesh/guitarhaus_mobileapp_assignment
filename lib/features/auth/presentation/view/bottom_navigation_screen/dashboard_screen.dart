@@ -299,7 +299,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           );
 
-  void _showQuickView(
+  Future<void> _showQuickView(
     BuildContext context,
     Map<String, dynamic> guitar,
     int index,
@@ -338,7 +338,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               );
             }
+            // Robust null and type checks
+            if (snapshot.data == null ||
+                (snapshot.data as Response).data == null) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      SizedBox(height: 16),
+                      Text(
+                        'No data found for this guitar.',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
             final data = (snapshot.data as Response).data['data'];
+            if (data == null) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      SizedBox(height: 16),
+                      Text(
+                        'No details available for this guitar.',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
             return SingleChildScrollView(
               padding: const EdgeInsets.all(28),
               child: Column(
@@ -431,7 +479,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(height: 12),
                   ],
-                  if (data['specifications'] != null) ...[
+                  if (data['specifications'] != null &&
+                      data['specifications'] is Map) ...[
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -443,7 +492,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    ...data['specifications'].entries.map<Widget>(
+                    ...((data['specifications'] as Map).entries.map<Widget>(
                       (entry) =>
                           entry.value != null &&
                                   entry.value.toString().isNotEmpty
@@ -452,12 +501,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 style: const TextStyle(color: Colors.black54),
                               )
                               : const SizedBox.shrink(),
-                    ),
+                    )),
                     const SizedBox(height: 12),
                   ],
                   if (data['stock'] != null) ...[
                     Text(
-                      'Stock: ${data['stock']}',
+                      'Stock:  ${data['stock']}',
                       style: const TextStyle(color: Colors.black54),
                     ),
                   ],

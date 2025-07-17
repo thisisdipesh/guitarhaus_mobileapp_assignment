@@ -97,7 +97,10 @@ class ApiService {
   }
 
   Future<Response> getGuitar(String guitarId) async {
-    return await _dio.get('/guitars/$guitarId');
+    // Add a timeout to prevent hanging
+    return await _dio
+        .get('/guitars/$guitarId')
+        .timeout(const Duration(seconds: 10));
   }
 
   Future<Response> getFeaturedGuitars() async {
