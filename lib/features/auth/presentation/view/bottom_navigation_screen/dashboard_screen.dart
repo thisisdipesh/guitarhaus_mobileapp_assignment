@@ -303,220 +303,208 @@ class _DashboardScreenState extends State<DashboardScreen> {
     BuildContext context,
     Map<String, dynamic> guitar,
     int index,
-  ) {
+  ) async {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.black.withOpacity(0.7),
+      backgroundColor: Colors.white.withOpacity(0.95),
       isScrollControlled: true,
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.60,
-          minChildSize: 0.45,
-          maxChildSize: 0.90,
-          expand: false,
-          builder: (context, scrollController) {
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(36),
-                ),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF18122B), Color(0xFF2D1E2F)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFF8F43EE).withOpacity(0.22),
-                    blurRadius: 32,
-                    offset: const Offset(0, -10),
+        return FutureBuilder(
+          future: _apiService.getGuitar(guitar['id']),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      SizedBox(height: 16),
+                      Text(
+                        'Could not load details. Please try again.',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                ],
-                border: Border.all(color: Color(0xFF8F43EE), width: 2.2),
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(36),
                 ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(22),
-                              child: Image.asset(
-                                guitar['image'],
-                                width: 200,
-                                height: 200,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (context, error, stackTrace) => Container(
-                                      width: 200,
-                                      height: 200,
-                                      color: Colors.grey[300],
-                                      child: const Icon(
-                                        Icons.image,
-                                        size: 60,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                              ),
-                            ),
-                            if (index == 0)
-                              Positioned(
-                                left: 0,
-                                top: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Color(
-                                      0xFFEE6C4D,
-                                    ).withOpacity(0.92), // vibrant orange
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: const Text(
-                                    'Best Seller',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            if (index == 1)
-                              Positioned(
-                                left: 0,
-                                top: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Color(
-                                      0xFFB799FF,
-                                    ).withOpacity(0.92), // vibrant purple
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Row(
-                                    children: const [
-                                      Icon(
-                                        Icons.album,
-                                        color: Color(0xFF5CE1E6),
-                                        size: 16,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'Classic',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 22),
-                        Text(
-                          guitar['name'],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            fontFamily: 'Times New Roman',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          guitar['brand'] ?? '',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 17,
-                            fontFamily: 'Ubuntu-Italic',
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.queue_music,
-                              color: Color(0xFFB799FF),
-                              size: 20,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              guitar['category'] ?? '',
-                              style: const TextStyle(
-                                color: Colors.white54,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-                        Text(
-                          '\$${guitar['price']}',
-                          style: const TextStyle(
-                            color: Color(0xFFFFD700),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 26,
-                            fontFamily: 'Ubuntu-Bold',
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8F43EE),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                              horizontal: 32,
+              );
+            }
+            final data = (snapshot.data as Response).data['data'];
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: Image.network(
+                      'http://10.0.2.2:3000/api/v1/guitars/${data['_id']}/image',
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (context, error, stackTrace) => Container(
+                            width: 200,
+                            height: 200,
+                            color: Colors.grey[200],
+                            child: const Icon(
+                              Icons.image,
+                              size: 60,
+                              color: Colors.grey,
                             ),
                           ),
-                          icon: const Icon(
-                            Icons.shopping_cart,
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            'Buy Now',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17,
-                            ),
-                          ),
-                          onPressed: () {
-                            // TODO: Implement buy now logic
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Proceed to checkout!'),
-                                backgroundColor: Color(0xFF8F43EE),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
                     ),
                   ),
-                ),
+                  const SizedBox(height: 22),
+                  Text(
+                    data['name'] ?? '',
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      fontFamily: 'Times New Roman',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    data['brand'] ?? '',
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 17,
+                      fontFamily: 'Ubuntu-Italic',
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.queue_music,
+                        color: Color(0xFF8F43EE),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        data['category'] ?? '',
+                        style: const TextStyle(
+                          color: Colors.black45,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    '\$${data['price']}',
+                    style: const TextStyle(
+                      color: Color(0xFFFFD700),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                      fontFamily: 'Ubuntu-Bold',
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  if (data['description'] != null) ...[
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Description:',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      data['description'],
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (data['specifications'] != null) ...[
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Specifications:',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ...data['specifications'].entries.map<Widget>(
+                      (entry) =>
+                          entry.value != null &&
+                                  entry.value.toString().isNotEmpty
+                              ? Text(
+                                '${entry.key}: ${entry.value}',
+                                style: const TextStyle(color: Colors.black54),
+                              )
+                              : const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (data['stock'] != null) ...[
+                    Text(
+                      'Stock: ${data['stock']}',
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                  if (data['rating'] != null) ...[
+                    Text(
+                      'Rating: ${data['rating']}',
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                  if (data['numReviews'] != null) ...[
+                    Text(
+                      'Reviews: ${data['numReviews']}',
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                  ],
+                  const SizedBox(height: 28),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF8F43EE),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 32,
+                      ),
+                    ),
+                    icon: const Icon(Icons.shopping_cart, color: Colors.white),
+                    label: const Text(
+                      'Buy Now',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Proceed to checkout!'),
+                          backgroundColor: Color(0xFF8F43EE),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             );
           },
