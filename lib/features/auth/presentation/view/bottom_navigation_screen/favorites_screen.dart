@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/network/api_service.dart';
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -122,6 +124,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final favoriteGuitars = context.watch<FavoritesProvider>().favoriteGuitars;
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -196,17 +199,68 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             child:
-                isLoading
-                    ? const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFFB799FF),
-                        ),
-                      ),
-                    )
-                    : wishlistItems.isEmpty
+                favoriteGuitars.isEmpty
                     ? _buildEmptyWishlist()
-                    : _buildWishlistItems(),
+                    : ListView.separated(
+                      itemCount: favoriteGuitars.length,
+                      separatorBuilder:
+                          (context, index) => const SizedBox(height: 18),
+                      itemBuilder: (context, index) {
+                        final guitar = favoriteGuitars[index];
+                        return Card(
+                          color: const Color(0xFF232946),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                'http://10.0.2.2:3000/api/v1/guitars/${guitar['id']}/image',
+                                width: 54,
+                                height: 54,
+                                fit: BoxFit.cover,
+                                errorBuilder:
+                                    (context, error, stackTrace) => Container(
+                                      width: 54,
+                                      height: 54,
+                                      color: Colors.grey[300],
+                                      child: const Icon(
+                                        Icons.image,
+                                        size: 32,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                              ),
+                            ),
+                            title: Text(
+                              guitar['name'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                                fontFamily: 'Ubuntu',
+                              ),
+                            ),
+                            subtitle: Text(
+                              guitar['brand'] ?? '',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+                            trailing: Text(
+                              '\u20B9${guitar['price']}',
+                              style: const TextStyle(
+                                color: Color(0xFFB799FF),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
           ),
         ],
       ),

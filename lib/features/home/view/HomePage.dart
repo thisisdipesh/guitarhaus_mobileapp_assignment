@@ -193,18 +193,6 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 24),
             // Featured Products
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Text(
-                'All Guitars',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFB799FF),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
             // isGuitarsLoading // This line is removed
             //     ? const Center( // This line is removed
             //       child: CircularProgressIndicator(color: Color(0xFFB799FF)), // This line is removed

@@ -6,6 +6,9 @@ import '../../../../home/view/HomePage.dart';
 import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 import 'dart:ui';
 import 'package:dio/dio.dart';
+import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
+import 'package:provider/provider.dart';
+// Removed unused or problematic imports
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,9 +25,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isGuitarsLoading = false;
   String? guitarsError;
   final ApiService _apiService = ApiService();
-
-  // Add this to the _DashboardScreenState class:
-  Set<String> favoriteGuitarIds = {};
 
   @override
   void initState() {
@@ -218,37 +218,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       const SizedBox(width: 8),
                                       IconButton(
                                         icon: Icon(
-                                          favoriteGuitarIds.contains(
-                                                guitar['id'],
-                                              )
+                                          context
+                                                  .watch<FavoritesProvider>()
+                                                  .isFavorite(guitar['id'])
                                               ? Icons.favorite
                                               : Icons.favorite_border,
                                           color:
-                                              favoriteGuitarIds.contains(
-                                                    guitar['id'],
-                                                  )
+                                              context
+                                                      .watch<
+                                                        FavoritesProvider
+                                                      >()
+                                                      .isFavorite(guitar['id'])
                                                   ? Colors.redAccent
                                                   : Color(0xFFB799FF),
                                         ),
                                         onPressed: () {
-                                          setState(() {
-                                            if (favoriteGuitarIds.contains(
+                                          final provider =
+                                              context.read<FavoritesProvider>();
+                                          if (provider.isFavorite(
+                                            guitar['id'],
+                                          )) {
+                                            provider.removeFavorite(
                                               guitar['id'],
-                                            )) {
-                                              favoriteGuitarIds.remove(
-                                                guitar['id'],
-                                              );
-                                            } else {
-                                              favoriteGuitarIds.add(
-                                                guitar['id'],
-                                              );
-                                            }
-                                          });
+                                            );
+                                          } else {
+                                            provider.addFavorite(guitar);
+                                          }
                                         },
                                         tooltip:
-                                            favoriteGuitarIds.contains(
-                                                  guitar['id'],
-                                                )
+                                            context
+                                                    .watch<FavoritesProvider>()
+                                                    .isFavorite(guitar['id'])
                                                 ? 'Remove from favorites'
                                                 : 'Add to favorites',
                                       ),

@@ -7,9 +7,16 @@ import 'features/auth/presentation/view/login_screen.dart';
 import 'features/auth/presentation/view/signup_screen.dart';
 import 'features/auth/presentation/view/splash_screen.dart';
 import 'features/auth/presentation/view/bottom_navigation_screen/dashboard_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
 
 void main() {
-  runApp(const GuitarHaus());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => FavoritesProvider(),
+      child: GuitarHaus(),
+    ),
+  );
 }
 
 class GuitarHaus extends StatelessWidget {
@@ -26,10 +33,10 @@ class GuitarHaus extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
-        '/dashboard': (context) =>  DashboardScreen(),
-        '/favorites': (context)=> FavoritesScreen(),
-        '/profile': (context)=> ProfileScreen(),
-        '/cart': (context) => CartScreen()
+        '/dashboard': (context) => DashboardScreen(),
+        '/favorites': (context) => FavoritesScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/cart': (context) => CartScreen(),
       },
     );
   }
