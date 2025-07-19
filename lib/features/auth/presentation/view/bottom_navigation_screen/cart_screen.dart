@@ -472,7 +472,7 @@ class _CartScreenState extends State<CartScreen> {
 
                             // Price
                             Text(
-                              '\$${item['price'].toStringAsFixed(2)}',
+                              '₹${item['price'].toStringAsFixed(2)}',
                               style: const TextStyle(
                                 color: Color(0xFFFFD700),
                                 fontWeight: FontWeight.bold,
@@ -654,7 +654,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ),
                   Text(
-                    '\$${totalAmount.toStringAsFixed(2)}',
+                    '₹${totalAmount.toStringAsFixed(2)}',
                     style: const TextStyle(
                       color: Color(0xFFFFD700),
                       fontSize: 28,
