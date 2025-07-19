@@ -10,6 +10,7 @@ import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'guitar_screen.dart';
+import '../featured_guitars_screen.dart';
 // Removed unused or problematic imports
 
 class DashboardScreen extends StatefulWidget {
