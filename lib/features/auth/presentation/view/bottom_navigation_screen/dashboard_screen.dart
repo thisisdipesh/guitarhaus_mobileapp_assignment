@@ -445,23 +445,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(22),
-                    child: Image.network(
-                      'http://10.0.2.2:3000/api/v1/guitars/${data['_id']}/image',
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.cover,
-                      errorBuilder:
-                          (context, error, stackTrace) => Container(
-                            width: 200,
-                            height: 200,
-                            color: Colors.grey[200],
-                            child: const Icon(
-                              Icons.image,
-                              size: 60,
-                              color: Colors.grey,
-                            ),
-                          ),
-                    ),
+                    child: _buildGuitarDetailImage(data),
                   ),
                   const SizedBox(height: 22),
                   Text(
@@ -737,23 +721,77 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
     );
   }
   if (id != null) {
-    final url = 'http://10.0.2.2:3000/api/v1/guitars/$id/image';
-    return Image.network(
-      url,
-      width: double.infinity,
-      height: 70,
-      fit: BoxFit.cover,
-      errorBuilder:
-          (context, error, stackTrace) => Container(
-            color: Colors.grey[300],
-            height: 70,
-            child: const Icon(Icons.image, size: 32, color: Colors.grey),
-          ),
-    );
+    // Use the correct image URL pattern
+    final images = guitarOrImagePath['images'];
+    if (images != null && images is List && images.isNotEmpty) {
+      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+      return Image.network(
+        imageUrl,
+        width: double.infinity,
+        height: 70,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (context, error, stackTrace) => Container(
+              color: Colors.grey[300],
+              height: 70,
+              child: const Icon(Icons.image, size: 32, color: Colors.grey),
+            ),
+      );
+    }
   }
   return Container(
     color: Colors.grey[300],
     height: 70,
     child: const Icon(Icons.image, size: 32, color: Colors.grey),
   );
+}
+
+Widget _buildGuitarDetailImage(Map<String, dynamic> data) {
+  final images = data['images'];
+  if (images != null && images is List && images.isNotEmpty) {
+    final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+    return Image.network(
+      imageUrl,
+      width: 200,
+      height: 200,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        print('Image loading error: $error');
+        return Container(
+          width: 200,
+          height: 200,
+          color: Colors.grey[200],
+          child: const Icon(Icons.image, size: 60, color: Colors.grey),
+        );
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          width: 200,
+          height: 200,
+          color: Colors.grey[200],
+          child: const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFFB799FF),
+              strokeWidth: 2,
+            ),
+          ),
+        );
+      },
+    );
+  } else {
+    return Image.asset(
+      'assets/image/bass_guitar.jpg',
+      width: 200,
+      height: 200,
+      fit: BoxFit.cover,
+      errorBuilder:
+          (context, error, stackTrace) => Container(
+            width: 200,
+            height: 200,
+            color: Colors.grey[200],
+            child: const Icon(Icons.image, size: 60, color: Colors.grey),
+          ),
+    );
+  }
 }

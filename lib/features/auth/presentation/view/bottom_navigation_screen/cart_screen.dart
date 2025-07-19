@@ -60,6 +60,11 @@ class _CartScreenState extends State<CartScreen> {
           totalAmount = cartData['totalAmount']?.toDouble() ?? 0.0;
           isLoading = false;
         });
+
+        // Debug: Print cart items and their image paths
+        for (var item in cartItems) {
+          print('Cart item: ${item['name']}, Image: ${item['image']}');
+        }
       }
     } on DioException {
       setState(() {
@@ -266,23 +271,7 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          item['image'],
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (context, error, stackTrace) => Container(
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey[300],
-                                child: const Icon(
-                                  Icons.image,
-                                  size: 40,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                        ),
+                        child: _buildCartItemImage(item['image']),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -422,5 +411,94 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildCartItemImage(String imagePath) {
+    print('Building cart item image with path: $imagePath'); // Debug
+    // Check if the image path is a network URL or asset path
+    if (imagePath.startsWith('http') || imagePath.startsWith('assets/')) {
+      // If it's already a full URL or asset path, use it as is
+      if (imagePath.startsWith('http')) {
+        print('Using network image: $imagePath');
+        return Image.network(
+          imagePath,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            print('Image loading error: $error');
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[300],
+              child: const Icon(Icons.image, size: 40, color: Colors.grey),
+            );
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 80,
+              height: 80,
+              color: Colors.grey[300],
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFB799FF),
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        // Asset path
+        print('Using asset image: $imagePath');
+        return Image.asset(
+          imagePath,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          errorBuilder:
+              (context, error, stackTrace) => Container(
+                width: 80,
+                height: 80,
+                color: Colors.grey[300],
+                child: const Icon(Icons.image, size: 40, color: Colors.grey),
+              ),
+        );
+      }
+    } else {
+      // If it's just a filename, construct the full URL
+      final imageUrl = 'http://10.0.2.2:3000/uploads/$imagePath';
+      print('Constructed image URL: $imageUrl');
+      return Image.network(
+        imageUrl,
+        width: 80,
+        height: 80,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          print('Image loading error: $error');
+          return Container(
+            width: 80,
+            height: 80,
+            color: Colors.grey[300],
+            child: const Icon(Icons.image, size: 40, color: Colors.grey),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: 80,
+            height: 80,
+            color: Colors.grey[300],
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFB799FF),
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 }

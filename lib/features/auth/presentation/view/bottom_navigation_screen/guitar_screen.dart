@@ -44,6 +44,7 @@ class _GuitarScreenState extends State<GuitarScreen> {
       final response = await _apiService.getGuitars(limit: 1000);
       if (response.statusCode == 200) {
         final items = response.data['data'] as List;
+        print('Guitars data: $items'); // Debug: Print the raw data
         setState(() {
           guitars =
               items
@@ -60,6 +61,10 @@ class _GuitarScreenState extends State<GuitarScreen> {
                   .toList();
           isGuitarsLoading = false;
         });
+        // Debug: Print processed guitars
+        for (var guitar in guitars) {
+          print('Guitar: ${guitar['name']}, Images: ${guitar['images']}');
+        }
       } else {
         setState(() {
           guitarsError = 'Failed to load guitars: \\${response.statusMessage}';
@@ -335,16 +340,31 @@ class _GuitarScreenState extends State<GuitarScreen> {
   Widget _buildGuitarImage(Map<String, dynamic> guitar) {
     final images = guitar['images'];
     if (images != null && images is List && images.isNotEmpty) {
-      // Adjust the URL to match your backend's image serving route
-      final imageUrl = 'http://10.0.2.2:3000/' + images[0];
+      // The backend serves static files from public folder, so images are at /uploads/filename
+      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+      print('Guitar image URL: $imageUrl'); // Debug
       return Image.network(
         imageUrl,
         fit: BoxFit.cover,
-        errorBuilder:
-            (context, error, stackTrace) => Container(
-              color: Colors.grey[300],
-              child: const Icon(Icons.image, size: 40, color: Colors.grey),
+        errorBuilder: (context, error, stackTrace) {
+          print('Image loading error: $error');
+          return Container(
+            color: Colors.grey[300],
+            child: const Icon(Icons.image, size: 40, color: Colors.grey),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey[300],
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFB799FF),
+                strokeWidth: 2,
+              ),
             ),
+          );
+        },
       );
     } else {
       return Image.asset(
