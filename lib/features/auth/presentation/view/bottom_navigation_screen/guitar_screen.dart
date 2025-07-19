@@ -340,8 +340,10 @@ class _GuitarScreenState extends State<GuitarScreen> {
   Widget _buildGuitarImage(Map<String, dynamic> guitar) {
     final images = guitar['images'];
     if (images != null && images is List && images.isNotEmpty) {
-      // The backend serves static files from public folder, so images are at /uploads/filename
-      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+      // Add cache-busting query parameter to always fetch the latest image
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final imageUrl =
+          'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
       print('Guitar image URL: $imageUrl'); // Debug
       return Image.network(
         imageUrl,
