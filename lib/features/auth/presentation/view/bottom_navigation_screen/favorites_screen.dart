@@ -243,24 +243,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                 ),
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(16),
-                                  child: Image.network(
-                                    'http://10.0.2.2:3000/api/v1/guitars/${guitar['id']}/image',
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Container(
-                                              width: 70,
-                                              height: 70,
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.image,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                  ),
+                                  child: _buildFavoriteGuitarImage(guitar),
                                 ),
                                 title: Row(
                                   children: [
@@ -518,5 +501,55 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         );
       },
     );
+  }
+
+  Widget _buildFavoriteGuitarImage(Map<String, dynamic> guitar) {
+    final images = guitar['images'];
+    if (images != null && images is List && images.isNotEmpty) {
+      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+      return Image.network(
+        imageUrl,
+        width: 70,
+        height: 70,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          print('Image loading error: $error');
+          return Container(
+            width: 70,
+            height: 70,
+            color: Colors.grey[300],
+            child: const Icon(Icons.image, size: 40, color: Colors.grey),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: 70,
+            height: 70,
+            color: Colors.grey[300],
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFB799FF),
+                strokeWidth: 2,
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.asset(
+        'assets/image/bass_guitar.jpg',
+        width: 70,
+        height: 70,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (context, error, stackTrace) => Container(
+              width: 70,
+              height: 70,
+              color: Colors.grey[300],
+              child: const Icon(Icons.image, size: 40, color: Colors.grey),
+            ),
+      );
+    }
   }
 }
