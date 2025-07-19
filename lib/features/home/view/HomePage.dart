@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
+import '../../auth/presentation/view/featured_guitars_screen.dart';
+import 'dart:ui';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -189,6 +191,131 @@ class _HomePageState extends State<HomePage> {
                     Color(0xFFFD5E53),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Featured Guitars Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Featured Guitars',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFB799FF),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FeaturedGuitarsScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'View All',
+                      style: TextStyle(
+                        color: Color(0xFFB799FF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Featured Guitars Preview
+            Container(
+              height: 200,
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.white.withOpacity(0.05),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Color(0xFFB799FF),
+                          size: 48,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Premium Selection',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Ubuntu-Bold',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Handpicked guitars by our experts',
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => const FeaturedGuitarsScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFB799FF),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'Explore Featured',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
