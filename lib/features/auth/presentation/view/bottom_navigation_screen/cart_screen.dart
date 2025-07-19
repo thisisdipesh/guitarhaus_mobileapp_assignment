@@ -351,14 +351,14 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _buildCartItems() {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
           // Cart Items List
           Expanded(
             child: ListView.separated(
               itemCount: cartItems.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              separatorBuilder: (context, index) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
                 final item = cartItems[index];
                 return _buildGuitarCartItem(item);
@@ -381,179 +381,230 @@ class _CartScreenState extends State<CartScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(24),
+              color: Colors.white.withOpacity(0.08),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+              padding: const EdgeInsets.all(20),
+              child: Column(
                 children: [
-                  // Guitar Image
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFB799FF).withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: _buildCartItemImage(item['image']),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-
-                  // Guitar Details
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.queue_music,
-                              color: Color(0xFFB799FF),
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                item['name'],
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  fontFamily: 'Ubuntu-Bold',
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                  // Top Row: Image and Details
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Guitar Image
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFB799FF).withOpacity(0.4),
+                              blurRadius: 15,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          item['brand'],
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontFamily: 'Ubuntu-Italic',
-                          ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: _buildCartItemImage(item['image']),
                         ),
-                        const SizedBox(height: 12),
+                      ),
+                      const SizedBox(width: 20),
 
-                        // Price and Quantity
-                        Row(
+                      // Guitar Details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Title with Icon
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.queue_music,
+                                  color: Color(0xFFB799FF),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    item['name'],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      fontFamily: 'Ubuntu-Bold',
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Brand
+                            Text(
+                              item['brand'],
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontFamily: 'Ubuntu-Italic',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Price
                             Text(
                               '\$${item['price'].toStringAsFixed(2)}',
                               style: const TextStyle(
                                 color: Color(0xFFFFD700),
                                 fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                                fontSize: 22,
                                 fontFamily: 'Ubuntu-Bold',
-                              ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFB799FF).withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.remove_circle_outline,
-                                      color: Color(0xFFB799FF),
-                                      size: 20,
-                                    ),
-                                    onPressed: () {
-                                      if (item['quantity'] > 1) {
-                                        _updateQuantity(
-                                          item['id'],
-                                          item['quantity'] - 1,
-                                        );
-                                      }
-                                    },
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFB799FF),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '${item['quantity']}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.add_circle_outline,
-                                      color: Color(0xFFB799FF),
-                                      size: 20,
-                                    ),
-                                    onPressed: () {
-                                      _updateQuantity(
-                                        item['id'],
-                                        item['quantity'] + 1,
-                                      );
-                                    },
-                                  ),
-                                ],
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
-                  // Remove Button
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                        size: 20,
+                  const SizedBox(height: 20),
+
+                  // Bottom Row: Quantity Controls and Remove Button
+                  Row(
+                    children: [
+                      // Quantity Controls
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFB799FF).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(0xFFB799FF).withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Minus Button
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFB799FF,
+                                  ).withOpacity(0.2),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    bottomLeft: Radius.circular(16),
+                                  ),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.remove,
+                                    color: Color(0xFFB799FF),
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    if (item['quantity'] > 1) {
+                                      _updateQuantity(
+                                        item['id'],
+                                        item['quantity'] - 1,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+
+                              // Quantity Display
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  child: Text(
+                                    '${item['quantity']}',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      fontFamily: 'Ubuntu-Bold',
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Plus Button
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFB799FF,
+                                  ).withOpacity(0.2),
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(16),
+                                    bottomRight: Radius.circular(16),
+                                  ),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.add,
+                                    color: Color(0xFFB799FF),
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    _updateQuantity(
+                                      item['id'],
+                                      item['quantity'] + 1,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      onPressed: () => _removeItem(item['id']),
-                      tooltip: 'Remove from cart',
-                    ),
+
+                      const SizedBox(width: 16),
+
+                      // Remove Button
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.red.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                            size: 24,
+                          ),
+                          onPressed: () => _removeItem(item['id']),
+                          tooltip: 'Remove from cart',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -566,27 +617,27 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _buildCheckoutSection() {
     return Container(
-      margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.only(top: 24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Column(
             children: [
               // Total Row
@@ -597,7 +648,7 @@ class _CartScreenState extends State<CartScreen> {
                     'Total Amount:',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Ubuntu-Bold',
                     ),
@@ -606,19 +657,19 @@ class _CartScreenState extends State<CartScreen> {
                     '\$${totalAmount.toStringAsFixed(2)}',
                     style: const TextStyle(
                       color: Color(0xFFFFD700),
-                      fontSize: 24,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Ubuntu-Bold',
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
               // Checkout Button
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 60,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -635,10 +686,10 @@ class _CartScreenState extends State<CartScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFB799FF),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                     ),
-                    elevation: 8,
-                    shadowColor: const Color(0xFFB799FF).withOpacity(0.3),
+                    elevation: 10,
+                    shadowColor: const Color(0xFFB799FF).withOpacity(0.4),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -646,13 +697,13 @@ class _CartScreenState extends State<CartScreen> {
                       Icon(
                         Icons.shopping_cart_checkout,
                         color: Colors.white,
-                        size: 24,
+                        size: 26,
                       ),
-                      SizedBox(width: 12),
+                      SizedBox(width: 14),
                       Text(
                         'Proceed to Checkout',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           fontFamily: 'Ubuntu-Bold',
@@ -676,21 +727,21 @@ class _CartScreenState extends State<CartScreen> {
     Widget buildImageWidget(String url) {
       return Image.network(
         url,
-        width: 100,
-        height: 100,
+        width: 120,
+        height: 120,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           print('Image loading error: $error');
           return Container(
-            width: 100,
-            height: 100,
+            width: 120,
+            height: 120,
             decoration: BoxDecoration(
               color: const Color(0xFFB799FF).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(
               Icons.queue_music,
-              size: 40,
+              size: 50,
               color: Color(0xFFB799FF),
             ),
           );
@@ -698,16 +749,16 @@ class _CartScreenState extends State<CartScreen> {
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Container(
-            width: 100,
-            height: 100,
+            width: 120,
+            height: 120,
             decoration: BoxDecoration(
               color: const Color(0xFFB799FF).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: const Center(
               child: CircularProgressIndicator(
                 color: Color(0xFFB799FF),
-                strokeWidth: 2,
+                strokeWidth: 3,
               ),
             ),
           );
@@ -725,20 +776,20 @@ class _CartScreenState extends State<CartScreen> {
         // Asset image
         return Image.asset(
           imagePath,
-          width: 100,
-          height: 100,
+          width: 120,
+          height: 120,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             return Container(
-              width: 100,
-              height: 100,
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
                 color: const Color(0xFFB799FF).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.queue_music,
-                size: 40,
+                size: 50,
                 color: Color(0xFFB799FF),
               ),
             );
