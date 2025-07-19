@@ -148,6 +148,17 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
     });
   }
 
+  // If a new image is uploaded, update the images array
+  if (req.file) {
+    req.body.images = [req.file.filename];
+    // Optionally, remove the old image file from disk here
+    // const fs = require('fs');
+    // if (guitar.images && guitar.images.length > 0) {
+    //   const oldImagePath = path.join(__dirname, '../public/uploads', guitar.images[0]);
+    //   if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
+    // }
+  }
+
   guitar = await Guitar.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true

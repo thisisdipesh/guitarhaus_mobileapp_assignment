@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { protect, authorize } = require("../middleware/auth");
+const upload = require("../middleware/uploads");
 
 const {
   getGuitars,
@@ -24,7 +25,7 @@ router.get("/:id/image", getGuitarImage);
 
 // Admin only routes
 router.post("/", protect, authorize("admin"), createGuitar);
-router.put("/:id", protect, authorize("admin"), updateGuitar);
+router.put("/:id", protect, authorize("admin"), upload.single('image'), updateGuitar);
 router.delete("/:id", protect, authorize("admin"), deleteGuitar);
 
 module.exports = router; 
