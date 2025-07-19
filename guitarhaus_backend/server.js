@@ -11,6 +11,7 @@ const xss = require("xss-clean");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+const fs = require('fs');
 
 app.use(cors());
 app.options("*", cors());
@@ -59,6 +60,39 @@ app.use((req, res, next) => {
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
+// Explicitly serve uploads directory for compatibility with mobile/emulator
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Debug middleware to log static file requests
+app.use('/uploads', (req, res, next) => {
+  console.log(`Static file request: ${req.method} ${req.url}`);
+  // Add CORS headers for static files
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
+// Test endpoint to list available images
+app.get('/api/v1/test-images', (req, res) => {
+  const uploadsDir = path.join(__dirname, 'public/uploads');
+  try {
+    const files = fs.readdirSync(uploadsDir);
+    res.json({ 
+      success: true, 
+      files: files,
+      uploadsPath: uploadsDir,
+      exists: fs.existsSync(uploadsDir)
+    });
+  } catch (error) {
+    res.json({ 
+      success: false, 
+      error: error.message,
+      uploadsPath: uploadsDir,
+      exists: fs.existsSync(uploadsDir)
+    });
+  }
+});
 
 // Mount routers
 app.use("/api/v1/customers", auth);
