@@ -120,6 +120,11 @@ exports.createGuitar = asyncHandler(async (req, res, next) => {
     });
   }
 
+  // If an image is uploaded, set the images array
+  if (req.file) {
+    req.body.images = [req.file.filename];
+  }
+
   const guitar = await Guitar.create(req.body);
 
   res.status(201).json({

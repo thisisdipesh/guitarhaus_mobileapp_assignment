@@ -24,7 +24,7 @@ router.get("/:id", getGuitar);
 router.get("/:id/image", getGuitarImage);
 
 // Admin only routes
-router.post("/", protect, authorize("admin"), createGuitar);
+router.post("/", protect, authorize("admin"), upload.single('image'), createGuitar);
 router.put("/:id", protect, authorize("admin"), upload.single('image'), updateGuitar);
 router.delete("/:id", protect, authorize("admin"), deleteGuitar);
 
