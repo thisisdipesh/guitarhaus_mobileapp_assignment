@@ -448,7 +448,7 @@ class _GuitarScreenState extends State<GuitarScreen> {
   ) async {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white.withOpacity(0.95),
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
         return FutureBuilder(
@@ -505,45 +505,288 @@ class _GuitarScreenState extends State<GuitarScreen> {
               );
             }
             final data = (snapshot.data as Response).data['data'];
-            return Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data['name'] ?? '',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    data['brand'] ?? '',
-                    style: const TextStyle(fontSize: 18, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Category: ${data['category'] ?? ''}',
-                    style: const TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Price: \u20B9${data['price']}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.deepPurple,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    data['description'] ?? '',
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
+            final images = data['images'] ?? [];
+            final specs = data['specifications'] ?? {};
+            return Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF232946), Color(0xFF8F43EE)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 20,
+                    offset: Offset(0, -8),
                   ),
                 ],
+              ),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 120,
+                        height: 6,
+                        margin: const EdgeInsets.only(bottom: 18),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    if (images.isNotEmpty)
+                      Center(
+                        child: Container(
+                          width: 220,
+                          height: 180,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.18),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: Image.network(
+                              images[0],
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) => Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(
+                                      Icons.image,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            data['name'] ?? '',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: 'Ubuntu-Bold',
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.queue_music,
+                          color: Color(0xFFFFD700),
+                          size: 28,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.business,
+                          color: Color(0xFFB799FF),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          data['brand'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                            fontFamily: 'Ubuntu-Italic',
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(
+                          Icons.category,
+                          color: Color(0xFFB799FF),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          data['category'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.attach_money,
+                          color: Color(0xFFFFD700),
+                          size: 22,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '\u20B9${data['price']}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            color: Color(0xFFFFD700),
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Ubuntu-Bold',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    if ((data['description'] ?? '').isNotEmpty)
+                      Text(
+                        data['description'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontFamily: 'Ubuntu-Regular',
+                        ),
+                      ),
+                    const SizedBox(height: 18),
+                    if (specs.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Specifications',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color(0xFFB799FF),
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Ubuntu-Bold',
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          ...specs.entries.map(
+                            (entry) =>
+                                entry.value != null &&
+                                        entry.value.toString().isNotEmpty
+                                    ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 2,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            size: 8,
+                                            color: Color(0xFFB799FF),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            '${entry.key[0].toUpperCase()}${entry.key.substring(1)}: ',
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Flexible(
+                                            child: Text(
+                                              entry.value.toString(),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFB799FF),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.favorite_border,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Favorite',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            // Optionally add to favorites here
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFD700),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.shopping_cart,
+                            color: Color(0xFF232946),
+                          ),
+                          label: const Text(
+                            'Add to Cart',
+                            style: TextStyle(
+                              color: Color(0xFF232946),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            // Optionally add to cart here
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },
