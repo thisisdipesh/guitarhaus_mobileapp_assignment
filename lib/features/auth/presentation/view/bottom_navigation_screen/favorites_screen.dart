@@ -236,102 +236,130 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   ),
                                 ],
                               ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 18,
-                                  vertical: 12,
-                                ),
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: _buildFavoriteGuitarImage(guitar),
-                                ),
-                                title: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.queue_music,
-                                      color: Color(0xFFFFD700),
-                                      size: 20,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Image
+                                  Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: _buildFavoriteGuitarImage(guitar),
                                     ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        guitar['name'],
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          fontFamily: 'Ubuntu-Bold',
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                  ),
+                                  // Details
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 4,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.queue_music,
+                                                color: Color(0xFFFFD700),
+                                                size: 20,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Expanded(
+                                                child: Text(
+                                                  guitar['name'],
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                    fontFamily: 'Ubuntu-Bold',
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            guitar['brand'] ?? '',
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 15,
+                                              fontFamily: 'Ubuntu-Italic',
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.star,
+                                                color: Color(0xFFFFD700),
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Text(
+                                                guitar['rating'].toString(),
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 14,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Flexible(
+                                                child: Text(
+                                                  '\u20B9${guitar['price']}',
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFB799FF),
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      guitar['brand'] ?? '',
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 15,
-                                        fontFamily: 'Ubuntu-Italic',
-                                      ),
-                                    ),
-                                    Row(
+                                  ),
+                                  // Action buttons
+                                  SizedBox(
+                                    width: 48,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Icon(
-                                          Icons.star,
-                                          color: Color(0xFFFFD700),
-                                          size: 16,
-                                        ),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          guitar['rating'].toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 14,
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.favorite,
+                                            color: Colors.redAccent,
                                           ),
+                                          tooltip: 'Remove from favorites',
+                                          onPressed:
+                                              () => context
+                                                  .read<FavoritesProvider>()
+                                                  .removeFavorite(guitar['id']),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          '\u20B9${guitar['price']}',
-                                          style: const TextStyle(
-                                            color: Color(0xFFB799FF),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.add_shopping_cart,
+                                            color: Color(0xFF8F43EE),
                                           ),
+                                          tooltip: 'Add to cart',
+                                          onPressed:
+                                              () => _addToCart(guitar['id']),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                                trailing: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.favorite,
-                                        color: Colors.redAccent,
-                                      ),
-                                      tooltip: 'Remove from favorites',
-                                      onPressed:
-                                          () => context
-                                              .read<FavoritesProvider>()
-                                              .removeFavorite(guitar['id']),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.add_shopping_cart,
-                                        color: Color(0xFF8F43EE),
-                                      ),
-                                      tooltip: 'Add to cart',
-                                      onPressed: () => _addToCart(guitar['id']),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -503,7 +531,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     if (images != null && images is List && images.isNotEmpty) {
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
-      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
+      final imageUrl =
+          'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
       return Image.network(
         imageUrl,
         width: 70,
