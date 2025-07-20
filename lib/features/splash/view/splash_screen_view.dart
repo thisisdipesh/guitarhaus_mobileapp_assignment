@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guitarhaus_mobileapp_assignment/app/service_locator/service_locator.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/login_screen.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view_model/login_viewmodel/login_viewmodel.dart';
-import 'package:guitarhaus_mobileapp_assignment/features/home/view/HomePage.dart';
-import 'package:guitarhaus_mobileapp_assignment/features/home/view_model/homepage_viewmodel.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/splash/splash_viewmodel.dart/splash_viewmodel.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/dashboard_screen.dart';
 

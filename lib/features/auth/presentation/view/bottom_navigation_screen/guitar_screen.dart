@@ -71,7 +71,7 @@ class _GuitarScreenState extends State<GuitarScreen> {
           isGuitarsLoading = false;
         });
       }
-    } on DioException catch (e) {
+    } on DioException {
       setState(() {
         guitarsError = 'Network error';
         isGuitarsLoading = false;
@@ -358,32 +358,33 @@ class _GuitarScreenState extends State<GuitarScreen> {
           ),
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              _showDebugInfo();
-            },
-            backgroundColor: const Color(0xFF8F43EE),
-            child: const Icon(Icons.bug_report, color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-          FloatingActionButton(
-            onPressed: () {
-              _fetchGuitars();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Refreshing guitar list...'),
-                  backgroundColor: Color(0xFFB799FF),
-                ),
-              );
-            },
-            backgroundColor: const Color(0xFFB799FF),
-            child: const Icon(Icons.refresh, color: Colors.white),
-          ),
-        ],
-      ),
+      // Remove the floatingActionButton Row with debug buttons
+      // floatingActionButton: Row(
+      //   mainAxisAlignment: MainAxisAlignment.end,
+      //   children: [
+      //     FloatingActionButton(
+      //       onPressed: () {
+      //         _showDebugInfo();
+      //       },
+      //       backgroundColor: const Color(0xFF8F43EE),
+      //       child: const Icon(Icons.bug_report, color: Colors.white),
+      //     ),
+      //     const SizedBox(width: 16),
+      //     FloatingActionButton(
+      //       onPressed: () {
+      //         _fetchGuitars();
+      //         ScaffoldMessenger.of(context).showSnackBar(
+      //           const SnackBar(
+      //             content: Text('Refreshing guitar list...'),
+      //             backgroundColor: Color(0xFFB799FF),
+      //           ),
+      //         );
+      //       },
+      //       backgroundColor: const Color(0xFFB799FF),
+      //       child: const Icon(Icons.refresh, color: Colors.white),
+      //     ),
+      //   ],
+      // ),
     );
   }
 

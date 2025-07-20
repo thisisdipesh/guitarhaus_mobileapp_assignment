@@ -84,11 +84,18 @@ exports.getGuitars = asyncHandler(async (req, res, next) => {
     };
   }
 
+  // Add full URL to images
+  const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+  const guitarsWithFullImageUrls = guitars.map(guitar => ({
+    ...guitar._doc,
+    images: (guitar.images || []).map(img => img.startsWith('http') ? img : `${BASE_URL}/uploads/${img}`)
+  }));
+
   res.status(200).json({
     success: true,
     count: guitars.length,
     pagination,
-    data: guitars
+    data: guitarsWithFullImageUrls
   });
 });
 

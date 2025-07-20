@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/network/api_service.dart';
-import 'bottom_navigation_screen/cart_screen.dart';
 import 'bottom_navigation_screen/favorites_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';

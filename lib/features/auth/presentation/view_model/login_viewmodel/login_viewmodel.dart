@@ -5,8 +5,6 @@ import 'package:guitarhaus_mobileapp_assignment/core/utils/mysnackbar.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/domain/use_case/user_login_usecase.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/signup_screen.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view_model/signup_viewmodel/signup_viewmodel.dart';
-import 'package:guitarhaus_mobileapp_assignment/features/home/view/HomePage.dart';
-import 'package:guitarhaus_mobileapp_assignment/features/home/view_model/homepage_viewmodel.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/dashboard_screen.dart';
 
 import 'login_event.dart';

@@ -593,7 +593,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
 
         // Settings Button
-        Container(
+        SizedBox(
           width: double.infinity,
           height: 60,
           child: ElevatedButton.icon(

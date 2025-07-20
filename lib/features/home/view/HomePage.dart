@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 import '../../auth/presentation/view/featured_guitars_screen.dart';
 import 'dart:ui';

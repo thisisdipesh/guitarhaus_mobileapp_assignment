@@ -180,7 +180,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 const SizedBox(height: 16),
                 ...widget.cartItems
                     .map((item) => _buildOrderItem(item))
-                    .toList(),
+                    ,
               ],
             ),
           ),

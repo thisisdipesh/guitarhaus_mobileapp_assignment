@@ -52,15 +52,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
     try {
       final response = await _apiService.getGuitars(limit: 1000);
-      print('GUITARS API RESPONSE: ' + response.data.toString());
+      print('GUITARS API RESPONSE: ${response.data}');
       if (response.statusCode == 200) {
         final items = response.data['data'] as List;
         setState(() {
           guitars =
               items.map((g) {
-                print('Guitar ID: ' + g['_id'].toString());
+                print('Guitar ID: ${g['_id']}');
                 print(
-                  'Has imageData: ' + (g['imageData'] != null ? 'YES' : 'NO'),
+                  'Has imageData: ${g['imageData'] != null ? 'YES' : 'NO'}',
                 );
                 print('Images: ${g['images']}');
                 return {
@@ -81,16 +81,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } on DioException catch (e) {
-      print('DioException: ' + e.toString());
+      print('DioException: $e');
       setState(() {
         guitarsError = 'Network error';
         isGuitarsLoading = false;
       });
     } catch (e, stack) {
-      print('Unexpected error in _fetchGuitars: ' + e.toString());
+      print('Unexpected error in _fetchGuitars: $e');
       print(stack);
       setState(() {
-        guitarsError = 'Unexpected error: ' + e.toString();
+        guitarsError = 'Unexpected error: $e';
         isGuitarsLoading = false;
       });
     }
@@ -632,16 +632,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF18122B),
       body: body,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ImageLoadingTest()),
-          );
-        },
-        backgroundColor: const Color(0xFFB799FF),
-        child: const Icon(Icons.bug_report, color: Colors.white),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
