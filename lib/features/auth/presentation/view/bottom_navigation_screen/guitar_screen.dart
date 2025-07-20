@@ -635,12 +635,6 @@ class _GuitarScreenState extends State<GuitarScreen> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Icon(
-                          Icons.attach_money,
-                          color: Color(0xFFFFD700),
-                          size: 22,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
                           '\u20B9${data['price']}',
                           style: const TextStyle(
