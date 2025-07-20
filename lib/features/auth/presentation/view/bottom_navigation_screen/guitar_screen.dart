@@ -116,245 +116,250 @@ class _GuitarScreenState extends State<GuitarScreen> {
     }
     return Scaffold(
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _fetchGuitars,
-          color: const Color(0xFFB799FF),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
-            child: ListView.separated(
-              itemCount: guitars.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 18),
-              itemBuilder: (context, index) {
-                final guitar = guitars[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+        // Remove RefreshIndicator to disable pull-to-refresh
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+          child: ListView.separated(
+            itemCount: guitars.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 18),
+            itemBuilder: (context, index) {
+              final guitar = guitars[index];
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Guitar Image
-                          Container(
-                            width: 110,
-                            height: 110,
-                            margin: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.deepPurpleAccent.withOpacity(
-                                    0.18,
-                                  ),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Guitar Image
+                        Container(
+                          width: 110,
+                          height: 110,
+                          margin: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.deepPurpleAccent.withOpacity(
+                                  0.18,
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(18),
-                              child: _buildGuitarImage(guitar),
-                            ),
-                          ),
-                          // Details and Actions
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 18,
-                                horizontal: 8,
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    guitar['name'],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      fontFamily: 'Ubuntu-Bold',
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: _buildGuitarImage(guitar),
+                          ),
+                        ),
+                        // Details and Actions
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 18,
+                              horizontal: 8,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  guitar['name'],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    fontFamily: 'Ubuntu-Bold',
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  guitar['brand'] ?? '',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 15,
+                                    fontFamily: 'Ubuntu-Italic',
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.queue_music,
+                                      color: Color(0xFFB799FF),
+                                      size: 16,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    guitar['brand'] ?? '',
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 15,
-                                      fontFamily: 'Ubuntu-Italic',
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      guitar['category'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.white54,
+                                        fontSize: 13,
+                                      ),
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.queue_music,
-                                        color: Color(0xFFB799FF),
-                                        size: 16,
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '\u20B9${guitar['price']}',
+                                      style: const TextStyle(
+                                        color: Color(0xFFFFD700),
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Ubuntu-Bold',
+                                        fontSize: 18,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        guitar['category'] ?? '',
-                                        style: const TextStyle(
-                                          color: Colors.white54,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        '\u20B9${guitar['price']}',
-                                        style: const TextStyle(
-                                          color: Color(0xFFFFD700),
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Ubuntu-Bold',
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        icon: Icon(
-                                          context
-                                                  .watch<FavoritesProvider>()
-                                                  .isFavorite(guitar['id'])
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color:
-                                              context
-                                                      .watch<
-                                                        FavoritesProvider
-                                                      >()
-                                                      .isFavorite(guitar['id'])
-                                                  ? Colors.redAccent
-                                                  : Color(0xFFB799FF),
-                                        ),
-                                        onPressed: () {
-                                          final provider =
-                                              context.read<FavoritesProvider>();
-                                          if (provider.isFavorite(
-                                            guitar['id'],
-                                          )) {
-                                            provider.removeFavorite(
-                                              guitar['id'],
-                                            );
-                                          } else {
-                                            provider.addFavorite(guitar);
-                                          }
-                                        },
-                                        tooltip:
+                                    ),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      icon: Icon(
+                                        context
+                                                .watch<FavoritesProvider>()
+                                                .isFavorite(guitar['id'])
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color:
                                             context
                                                     .watch<FavoritesProvider>()
                                                     .isFavorite(guitar['id'])
-                                                ? 'Remove from favorites'
-                                                : 'Add to favorites',
+                                                ? Colors.redAccent
+                                                : Color(0xFFB799FF),
                                       ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.shopping_cart,
-                                          color: Color(0xFF8F43EE),
-                                        ),
-                                        onPressed: () async {
-                                          try {
-                                            final response = await _apiService
-                                                .addToCart(guitar['id'], 1);
-                                            print(
-                                              'Add to cart response: ${response.data}',
-                                            );
-                                            if (response.statusCode == 200 ||
-                                                response.statusCode == 201) {
-                                              if (mounted) {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (context) =>
-                                                            const CartScreen(),
-                                                  ),
-                                                );
-                                              }
-                                            } else {
-                                              if (mounted) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      'Failed to add to cart: '
-                                                      '${response.data['message'] ?? 'Unknown error'}',
-                                                    ),
-                                                    backgroundColor:
-                                                        const Color(0xFFB799FF),
-                                                  ),
-                                                );
-                                              }
+                                      onPressed: () {
+                                        final provider =
+                                            context.read<FavoritesProvider>();
+                                        if (provider.isFavorite(guitar['id'])) {
+                                          provider.removeFavorite(guitar['id']);
+                                        } else {
+                                          provider.addFavorite(guitar);
+                                          // Show SnackBar when added to favorites
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Added to favorites',
+                                              ),
+                                              backgroundColor: Color(
+                                                0xFFB799FF,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      tooltip:
+                                          context
+                                                  .watch<FavoritesProvider>()
+                                                  .isFavorite(guitar['id'])
+                                              ? 'Remove from favorites'
+                                              : 'Add to favorites',
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.shopping_cart,
+                                        color: Color(0xFF8F43EE),
+                                      ),
+                                      onPressed: () async {
+                                        try {
+                                          final response = await _apiService
+                                              .addToCart(guitar['id'], 1);
+                                          print(
+                                            'Add to cart response: ${response.data}',
+                                          );
+                                          if (response.statusCode == 200 ||
+                                              response.statusCode == 201) {
+                                            if (mounted) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (context) =>
+                                                          const CartScreen(),
+                                                ),
+                                              );
                                             }
-                                          } catch (e) {
+                                          } else {
                                             if (mounted) {
                                               ScaffoldMessenger.of(
                                                 context,
                                               ).showSnackBar(
-                                                const SnackBar(
+                                                SnackBar(
                                                   content: Text(
-                                                    'Failed to add to cart!',
+                                                    'Failed to add to cart: '
+                                                    '${response.data['message'] ?? 'Unknown error'}',
                                                   ),
-                                                  backgroundColor: Color(
+                                                  backgroundColor: const Color(
                                                     0xFFB799FF,
                                                   ),
                                                 ),
                                               );
                                             }
                                           }
-                                        },
-                                        tooltip: 'Add to cart',
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.visibility,
-                                          color: Color(0xFFB799FF),
-                                        ),
-                                        onPressed:
-                                            () => _showQuickView(
+                                        } catch (e) {
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(
                                               context,
-                                              guitar,
-                                              index,
-                                            ),
-                                        tooltip: 'Quick view',
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Failed to add to cart!',
+                                                ),
+                                                backgroundColor: Color(
+                                                  0xFFB799FF,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                      tooltip: 'Add to cart',
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.visibility,
+                                        color: Color(0xFFB799FF),
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                      onPressed:
+                                          () => _showQuickView(
+                                            context,
+                                            guitar,
+                                            index,
+                                          ),
+                                      tooltip: 'Quick view',
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
