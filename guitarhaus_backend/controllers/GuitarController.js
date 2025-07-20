@@ -6,12 +6,14 @@ const { protect, authorize } = require("../middleware/auth");
 // @route   GET /api/v1/guitars
 // @access  Public
 exports.getGuitars = asyncHandler(async (req, res, next) => {
+  console.log("GET GUITARS CALLED");
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const total = await Guitar.countDocuments();
 
+  
   // Only select fields needed for the list (exclude imageData)
   let query = Guitar.find({}, {
     imageData: 0 // Exclude imageData field
@@ -63,6 +65,7 @@ exports.getGuitars = asyncHandler(async (req, res, next) => {
   query = query.skip(startIndex).limit(limit);
 
   const guitars = await query;
+  console.log("GUITARS: ", guitars)
 
   // Pagination result
   const pagination = {};
@@ -113,24 +116,76 @@ exports.getGuitar = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/guitars
 // @access  Private (Admin only)
 exports.createGuitar = asyncHandler(async (req, res, next) => {
+  console.log('=== CREATE GUITAR DEBUG ===');
+  console.log('User:', req.user);
+  console.log('User role:', req.user?.role);
+  
+  if (!req.user) {
+    console.log('❌ No user found in request');
+    return res.status(401).json({ 
+      success: false, 
+      message: "Not authorized, no user found" 
+    });
+  }
+  
   if (req.user.role !== "admin") {
+    console.log('❌ User is not admin. Role:', req.user.role);
     return res.status(403).json({ 
       success: false, 
-      message: "Access denied. Admins only." 
+      message: "Access denied. Admins only. Current role: " + req.user.role 
     });
   }
 
+  console.log('✅ User is admin, proceeding with guitar creation');
+  console.log('Request body:', req.body);
+  console.log('Request file:', req.file);
+  console.log('Request files:', req.files);
+
   // If an image is uploaded, set the images array
   if (req.file) {
+    console.log('✅ Image file found:', req.file.filename);
     req.body.images = [req.file.filename];
+  } else {
+    console.log('❌ No image file uploaded');
   }
 
-  const guitar = await Guitar.create(req.body);
+  // Handle specifications object if it's a string
+  if (req.body.specifications && typeof req.body.specifications === 'string') {
+    try {
+      req.body.specifications = JSON.parse(req.body.specifications);
+      console.log('✅ Specifications parsed successfully');
+    } catch (error) {
+      console.log('❌ Error parsing specifications:', error);
+      req.body.specifications = {};
+    }
+  }
 
-  res.status(201).json({
-    success: true,
-    data: guitar
-  });
+  // Ensure price and stock are numbers
+  if (req.body.price) {
+    req.body.price = parseFloat(req.body.price);
+  }
+  if (req.body.stock) {
+    req.body.stock = parseInt(req.body.stock);
+  }
+
+  console.log('Final request body:', req.body);
+
+  try {
+    const guitar = await Guitar.create(req.body);
+    console.log('✅ Guitar created successfully:', guitar._id);
+
+    res.status(201).json({
+      success: true,
+      data: guitar
+    });
+  } catch (error) {
+    console.error('❌ Error creating guitar:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Error creating guitar',
+      details: error.toString()
+    });
+  }
 });
 
 // @desc    Update guitar
@@ -153,8 +208,14 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
     });
   }
 
+  console.log('=== UPDATE GUITAR DEBUG ===');
+  console.log('Request body:', req.body);
+  console.log('Request file:', req.file);
+  console.log('Current guitar images:', guitar.images);
+
   // If a new image is uploaded, update the images array
   if (req.file) {
+    console.log('New image file found:', req.file.filename);
     req.body.images = [req.file.filename];
     // Optionally, remove the old image file from disk here
     // const fs = require('fs');
@@ -162,17 +223,49 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
     //   const oldImagePath = path.join(__dirname, '../public/uploads', guitar.images[0]);
     //   if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
     // }
+  } else {
+    console.log('No new image file uploaded');
   }
 
-  guitar = await Guitar.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  // Handle specifications object if it's a string
+  if (req.body.specifications && typeof req.body.specifications === 'string') {
+    try {
+      req.body.specifications = JSON.parse(req.body.specifications);
+    } catch (error) {
+      console.log('Error parsing specifications:', error);
+      req.body.specifications = {};
+    }
+  }
 
-  res.status(200).json({
-    success: true,
-    data: guitar
-  });
+  // Ensure price and stock are numbers
+  if (req.body.price) {
+    req.body.price = parseFloat(req.body.price);
+  }
+  if (req.body.stock) {
+    req.body.stock = parseInt(req.body.stock);
+  }
+
+  console.log('Final request body:', req.body);
+
+  try {
+    guitar = await Guitar.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+
+    console.log('Updated guitar:', guitar);
+
+    res.status(200).json({
+      success: true,
+      data: guitar
+    });
+  } catch (error) {
+    console.error('Error updating guitar:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Error updating guitar'
+    });
+  }
 });
 
 // @desc    Delete guitar

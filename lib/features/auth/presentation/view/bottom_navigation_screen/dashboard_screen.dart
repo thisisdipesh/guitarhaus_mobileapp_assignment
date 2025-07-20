@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'guitar_screen.dart';
 import '../featured_guitars_screen.dart';
+import 'test_image_loading.dart';
 // Removed unused or problematic imports
 
 class DashboardScreen extends StatefulWidget {
@@ -61,12 +62,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 print(
                   'Has imageData: ' + (g['imageData'] != null ? 'YES' : 'NO'),
                 );
+                print('Images: ${g['images']}');
                 return {
                   'id': g['_id'],
                   'name': g['name'],
                   'brand': g['brand'],
                   'price': g['price'].toString(),
                   'category': g['category'],
+                  'images': g['images'],
                 };
               }).toList();
           isGuitarsLoading = false;
@@ -629,6 +632,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF18122B),
       body: body,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ImageLoadingTest()),
+          );
+        },
+        backgroundColor: const Color(0xFFB799FF),
+        child: const Icon(Icons.bug_report, color: Colors.white),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
@@ -724,25 +737,50 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
   if (id != null) {
     // Use the correct image URL pattern
     final images = guitarOrImagePath['images'];
+    print('Building image for guitar $id, images: $images');
     if (images != null && images is List && images.isNotEmpty) {
-      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+      // Add cache-busting query parameter to always fetch the latest image
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final imageUrl =
+          'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
+      print('🖼️ Image URL: $imageUrl');
+      print('🖼️ Guitar ID: $id');
+      print('🖼️ Images array: $images');
       return Image.network(
         imageUrl,
         width: double.infinity,
-        height: 70,
+        height: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder:
-            (context, error, stackTrace) => Container(
-              color: Colors.grey[300],
-              height: 70,
-              child: const Icon(Icons.image, size: 32, color: Colors.grey),
+        errorBuilder: (context, error, stackTrace) {
+          print('❌ Image loading error for $imageUrl: $error');
+          print('❌ Stack trace: $stackTrace');
+          return Container(
+            color: Colors.grey[300],
+            height: double.infinity,
+            child: const Icon(Icons.image, size: 32, color: Colors.grey),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey[200],
+            height: double.infinity,
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFB799FF),
+                strokeWidth: 2,
+              ),
             ),
+          );
+        },
       );
+    } else {
+      print('No images found for guitar $id');
     }
   }
   return Container(
     color: Colors.grey[300],
-    height: 70,
+    height: double.infinity,
     child: const Icon(Icons.image, size: 32, color: Colors.grey),
   );
 }

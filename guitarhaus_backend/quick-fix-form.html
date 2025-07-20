@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Fix - Guitar Upload</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .code {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎸 Quick Fix for Your React Form</h1>
+        
+        <div class="highlight">
+            <h3>✅ This form works perfectly - use it as a reference!</h3>
+            <p>Fill out this form and test it. If it works, apply the same fix to your React form.</p>
+        </div>
+
+        <div id="message"></div>
+        
+        <form id="guitarForm">
+            <div class="grid">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="brand">Brand:</label>
+                    <input type="text" id="brand" name="brand" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select id="category" name="category" required>
+                    <option value="">Select Category</option>
+                    <option value="Acoustic">Acoustic</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Bass">Bass</option>
+                    <option value="Classical">Classical</option>
+                    <option value="Ukulele">Ukulele</option>
+                    <option value="Accessories">Accessories</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="3" required></textarea>
+            </div>
+            
+            <div class="grid">
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" name="price" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock">Stock:</label>
+                    <input type="number" id="stock" name="stock" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="image">Image:</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">Add Guitar</button>
+        </form>
+
+        <div class="highlight">
+            <h3>🔧 Copy This Code to Fix Your React Form:</h3>
+            
+            <h4>1. File Input (JSX):</h4>
+            <div class="code">
+&lt;input 
+  type="file" 
+  name="image"  // ✅ MUST be 'image'
+  onChange={handleFileChange}
+  accept="image/*"
+/&gt;
+            </div>
+
+            <h4>2. FormData (JavaScript):</h4>
+            <div class="code">
+const formData = new FormData();
+
+// ✅ CORRECT - Use 'image' as field name
+if (imageFile) {
+  formData.append('image', imageFile);  // Must be 'image'
+}
+
+// Add other fields
+formData.append('name', guitarName);
+formData.append('brand', brand);
+formData.append('category', category);
+formData.append('description', description);
+formData.append('price', price);
+formData.append('stock', stock);
+            </div>
+
+            <h4>3. API Call:</h4>
+            <div class="code">
+const response = await axios.post('http://localhost:3000/api/v1/guitars', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+    'Authorization': `Bearer ${adminToken}`  // Use admin token
+  }
+});
+            </div>
+
+            <h4>❌ Common Mistakes (Fix These):</h4>
+            <ul>
+                <li><code>formData.append('file', imageFile)</code> ❌ Wrong</li>
+                <li><code>formData.append('guitarImage', imageFile)</code> ❌ Wrong</li>
+                <li><code>formData.append('photo', imageFile)</code> ❌ Wrong</li>
+            </ul>
+
+            <h4>✅ Correct Code:</h4>
+            <ul>
+                <li><code>formData.append('image', imageFile)</code> ✅ Correct</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Admin token
+        const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4N2JlNWU5NjRjNmRmMzFiYWI1ZjUwYyIsImlhdCI6MTc1Mjk1MTIwMiwiZXhwIjoxNzU1NTQzMjAyfQ.hcUlJ6DIgbBHogMs1ks2W0wu8-XWmOXjEoNFeRygntE';
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+        
+        document.getElementById('guitarForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding Guitar...';
+            
+            try {
+                const formData = new FormData();
+                
+                // ✅ CRITICAL: Use 'image' as the field name
+                const imageFile = document.getElementById('image').files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile); // Must be 'image'
+                }
+                
+                // Add other fields
+                formData.append('name', document.getElementById('name').value);
+                formData.append('brand', document.getElementById('brand').value);
+                formData.append('category', document.getElementById('category').value);
+                formData.append('description', document.getElementById('description').value);
+                formData.append('price', document.getElementById('price').value);
+                formData.append('stock', document.getElementById('stock').value);
+                
+                console.log('🚀 Sending request with field name: image');
+                console.log('📁 File:', imageFile?.name);
+                
+                const response = await axios.post('http://localhost:3000/api/v1/guitars', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+                
+                if (response.status === 201) {
+                    console.log('✅ Guitar added successfully!');
+                    showMessage('Guitar added successfully!', 'success');
+                    document.getElementById('guitarForm').reset();
+                }
+            } catch (error) {
+                console.error('❌ Error adding guitar:', error);
+                showMessage(error.response?.data?.message || 'Error adding guitar. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Guitar';
+            }
+        });
+    </script>
+</body>
+</html> 

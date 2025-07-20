@@ -15,6 +15,7 @@ const fs = require('fs');
 
 app.use(cors());
 app.options("*", cors());
+
 // Load env file
 dotenv.config({
     path: "./config/config.env",
@@ -51,27 +52,21 @@ app.use(helmet());
 
 // Prevent XSS attacks
 app.use(xss());
+
+// CORS headers for all requests
 app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
 
-// Set static folder
+// Serve static files - this must come before routes
 app.use(express.static(path.join(__dirname, 'public')));
-// Explicitly serve uploads directory for compatibility with mobile/emulator
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-
-// Debug middleware to log static file requests
-app.use('/uploads', (req, res, next) => {
-  console.log(`Static file request: ${req.method} ${req.url}`);
-  // Add CORS headers for static files
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
 
 // Test endpoint to list available images
 app.get('/api/v1/test-images', (req, res) => {
@@ -85,6 +80,7 @@ app.get('/api/v1/test-images', (req, res) => {
       exists: fs.existsSync(uploadsDir)
     });
   } catch (error) {
+    console.log("HERE WE GO: ", error);
     res.json({ 
       success: false, 
       error: error.message,
@@ -111,6 +107,8 @@ const server = app.listen(
         console.log(
             `GuitarHaus Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
         );
+        console.log(`Test images: http://localhost:${PORT}/api/v1/test-images`);
+        console.log(`Image example: http://localhost:${PORT}/uploads/IMG-1752931327664.jpg`);
     }
 );
 

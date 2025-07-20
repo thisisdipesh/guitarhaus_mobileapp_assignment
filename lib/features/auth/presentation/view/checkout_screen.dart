@@ -266,6 +266,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
       }
     } else {
+      print("IMAGE PATH: $imagePath");
       final imageUrl = 'http://10.0.2.2:3000/uploads/$imagePath';
       return Image.network(
         imageUrl,

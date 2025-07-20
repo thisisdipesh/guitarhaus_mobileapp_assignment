@@ -427,12 +427,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 child: ListTile(
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      item['image'],
-                      width: 54,
-                      height: 54,
-                      fit: BoxFit.cover,
-                    ),
+                    child: _buildFavoriteGuitarImage(item),
                   ),
                   title: Text(
                     item['name'],
@@ -506,7 +501,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget _buildFavoriteGuitarImage(Map<String, dynamic> guitar) {
     final images = guitar['images'];
     if (images != null && images is List && images.isNotEmpty) {
-      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+      // Add cache-busting query parameter to always fetch the latest image
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
       return Image.network(
         imageUrl,
         width: 70,
