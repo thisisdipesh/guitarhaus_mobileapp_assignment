@@ -591,43 +591,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
         ),
-
-        // Settings Button
-        SizedBox(
-          width: double.infinity,
-          height: 60,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFFB799FF), width: 2),
-              ),
-            ),
-            icon: const Icon(
-              Icons.settings,
-              color: Color(0xFFB799FF),
-              size: 24,
-            ),
-            label: const Text(
-              "Settings",
-              style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFFB799FF),
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Ubuntu-Bold',
-              ),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Settings feature coming soon!'),
-                  backgroundColor: Color(0xFFB799FF),
-                ),
-              );
-            },
-          ),
-        ),
       ],
     );
   }
