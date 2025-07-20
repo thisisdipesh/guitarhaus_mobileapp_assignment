@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart'; // Or change to 'home_screen.dart' if going to home directly
 import 'dart:ui';
+import '../../../../core/network/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -27,13 +29,24 @@ class _SplashScreenState extends State<SplashScreen>
       end: 0.08,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    // Simulate loading
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-    });
+    // Restore token and navigate
+    _restoreTokenAndNavigate();
+  }
+
+  Future<void> _restoreTokenAndNavigate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    await Future.delayed(const Duration(seconds: 2)); // Simulate loading
+    if (token != null && token.isNotEmpty) {
+      ApiService().setAuthToken(token);
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
+    } else {
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    }
   }
 
   @override

@@ -742,8 +742,23 @@ class _GuitarScreenState extends State<GuitarScreen> {
                             ),
                           ),
                           onPressed: () {
-                            // Optionally add to favorites here
+                            // Add to favorites provider
+                            final provider = context.read<FavoritesProvider>();
+                            provider.addFavorite({
+                              'id': data['_id'],
+                              'name': data['name'],
+                              'brand': data['brand'],
+                              'price': data['price'].toString(),
+                              'category': data['category'],
+                              'images': data['images'],
+                            });
                             Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Added to favorites'),
+                                backgroundColor: Color(0xFFB799FF),
+                              ),
+                            );
                           },
                         ),
                         ElevatedButton.icon(
@@ -768,9 +783,50 @@ class _GuitarScreenState extends State<GuitarScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onPressed: () {
-                            // Optionally add to cart here
-                            Navigator.pop(context);
+                          onPressed: () async {
+                            try {
+                              final response = await _apiService.addToCart(
+                                data['_id'],
+                                1,
+                              );
+                              Navigator.pop(context);
+                              if (response.statusCode == 200 ||
+                                  response.statusCode == 201) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Added to cart'),
+                                    backgroundColor: Color(0xFFFFD700),
+                                  ),
+                                );
+                              } else {
+                                String errorMsg = 'Failed to add to cart';
+                                if (response.data != null &&
+                                    response.data['message'] != null) {
+                                  errorMsg = response.data['message'];
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(errorMsg),
+                                    backgroundColor: const Color(0xFFB799FF),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              Navigator.pop(context);
+                              String errorMsg = 'Failed to add to cart!';
+                              if (e is DioException &&
+                                  e.response != null &&
+                                  e.response?.data != null) {
+                                errorMsg =
+                                    e.response?.data['message'] ?? errorMsg;
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(errorMsg),
+                                  backgroundColor: Color(0xFFB799FF),
+                                ),
+                              );
+                            }
                           },
                         ),
                       ],
