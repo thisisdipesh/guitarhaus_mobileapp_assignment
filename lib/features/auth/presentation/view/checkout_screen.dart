@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/network/api_service.dart';
+import '../../../../core/network/stripe_payment_service.dart';
 import 'dart:ui';
+import 'payment_success_screen.dart';
+import '../../../../core/common/stripe_webview.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -20,6 +23,7 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final ApiService _apiService = ApiService();
+  final StripePaymentService _stripeService = StripePaymentService();
   final _formKey = GlobalKey<FormState>();
 
   // Form controllers
@@ -28,10 +32,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
   final _postalCodeController = TextEditingController();
+  final _countryController = TextEditingController();
 
   // Payment method
-  String _selectedPaymentMethod = 'Credit Card';
+  String _selectedPaymentMethod = 'Stripe';
   bool _isLoading = false;
 
   // Shipping cost
@@ -52,7 +58,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _phoneController.dispose();
     _addressController.dispose();
     _cityController.dispose();
+    _stateController.dispose();
     _postalCodeController.dispose();
+    _countryController.dispose();
     super.dispose();
   }
 
@@ -61,6 +69,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final token = prefs.getString('token');
     if (token != null) {
       _apiService.setAuthToken(token);
+      _stripeService.setAuthToken(token);
     }
   }
 
@@ -76,6 +85,209 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   double get _subtotal => widget.totalAmount;
   double get _tax => _subtotal * _taxRate;
   double get _total => _subtotal + _shippingCost + _tax;
+
+  // Enhanced Stripe payment handler
+  Future<void> onStripePay() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Process payment using Stripe Payment Service
+      final result = await _stripeService.processPayment(_total, 'usd');
+
+      if (result.success) {
+        // Payment successful, place order
+        await _placeOrder();
+      } else {
+        // Show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Payment failed: ${result.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Payment error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Process subscription payment (for guitars with stripePriceId)
+  Future<void> onStripeSubscriptionPay(String priceId) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await _stripeService.processSubscription(priceId);
+
+      if (result.success && result.checkoutUrl != null) {
+        // For subscription payments, we need to handle the checkout URL
+        // In a real app, you might want to open this in a WebView
+        if (mounted) {
+          _showSubscriptionCheckoutDialog(result.checkoutUrl!);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Subscription setup failed: ${result.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Subscription error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showSubscriptionCheckoutDialog(String checkoutUrl) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF232946),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              'Complete Subscription',
+              style: TextStyle(color: Colors.white, fontFamily: 'Ubuntu-Bold'),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'To complete your subscription, please visit the checkout page.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Checkout URL:',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                Text(
+                  checkoutUrl,
+                  style: TextStyle(color: Color(0xFFB799FF), fontSize: 10),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: Color(0xFFB799FF)),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _openStripeWebView(checkoutUrl);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB799FF),
+                ),
+                child: const Text(
+                  'Open Checkout',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _openStripeWebView(String checkoutUrl) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder:
+            (context) => StripeWebView(
+              checkoutUrl: checkoutUrl,
+              onSuccess: (url) {
+                // Handle successful subscription
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Subscription completed successfully!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/dashboard', (route) => false);
+              },
+              onCancel: (url) {
+                // Handle cancelled subscription
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Subscription was cancelled'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              },
+            ),
+      ),
+    );
+  }
+
+  // Legacy payment intent method (keeping for backward compatibility)
+  Future<Map<String, dynamic>> fetchPaymentIntentClientSecret() async {
+    final dio = Dio();
+    final response = await dio.post(
+      'http://10.0.2.2:3000/api/v1/orders/create-payment-intent',
+      data: {
+        'amount': _total, // amount in dollars
+        'currency': 'usd',
+      },
+      options: Options(headers: {'Content-Type': 'application/json'}),
+    );
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      return {'clientSecret': response.data['clientSecret']};
+    } else {
+      throw Exception(
+        'Failed to create payment intent: ${response.data['message']}',
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,9 +390,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                ...widget.cartItems
-                    .map((item) => _buildOrderItem(item))
-                    ,
+                ...widget.cartItems.map((item) => _buildOrderItem(item)),
               ],
             ),
           ),
@@ -384,37 +594,53 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        controller: _cityController,
-                        label: 'City',
-                        icon: Icons.location_city,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your city';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildTextField(
-                        controller: _postalCodeController,
-                        label: 'Postal Code',
-                        icon: Icons.pin_drop,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your postal code';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ],
+                _buildTextField(
+                  controller: _cityController,
+                  label: 'City',
+                  icon: Icons.location_city,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your city';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _stateController,
+                  label: 'State',
+                  icon: Icons.map,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your state';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _postalCodeController,
+                  label: 'Postal Code',
+                  icon: Icons.pin_drop,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your postal code';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildTextField(
+                  controller: _countryController,
+                  label: 'Country',
+                  icon: Icons.public,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your country';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
@@ -510,9 +736,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                _buildPaymentOption('Credit Card', Icons.credit_card),
-                const SizedBox(height: 8),
-                _buildPaymentOption('PayPal', Icons.payment),
+                _buildPaymentOption('Stripe', Icons.credit_card),
                 const SizedBox(height: 8),
                 _buildPaymentOption('Cash on Delivery', Icons.money),
               ],
@@ -662,39 +886,134 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildPlaceOrderButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _placeOrder,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFB799FF),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+    if (_selectedPaymentMethod == 'Stripe') {
+      return Column(
+        children: [
+          // Main Stripe payment button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : onStripePay,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFB799FF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 8,
+                shadowColor: const Color(0xFFB799FF).withOpacity(0.3),
+              ),
+              child:
+                  _isLoading
+                      ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                      : const Text(
+                        'Pay with Stripe',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontFamily: 'Ubuntu-Bold',
+                        ),
+                      ),
+            ),
           ),
-          elevation: 8,
-          shadowColor: const Color(0xFFB799FF).withOpacity(0.3),
-        ),
-        child:
-            _isLoading
-                ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-                : const Text(
-                  'Place Order',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'Ubuntu-Bold',
+
+          // Additional info for Stripe payments
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF232946).withOpacity(0.5),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFFB799FF).withOpacity(0.3),
+              ),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.security, color: Color(0xFFB799FF), size: 16),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Secure payment powered by Stripe. Your payment information is encrypted and secure.',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ),
-      ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Cash on Delivery
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: _isLoading ? null : _placeOrder,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFB799FF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 8,
+              shadowColor: const Color(0xFFB799FF).withOpacity(0.3),
+            ),
+            child:
+                _isLoading
+                    ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                    : const Text(
+                      'Place Order (Cash on Delivery)',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'Ubuntu-Bold',
+                      ),
+                    ),
+          ),
+        ),
+
+        // Additional info for COD
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF232946).withOpacity(0.5),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFB799FF).withOpacity(0.3)),
+          ),
+          child: const Row(
+            children: [
+              Icon(Icons.payment, color: Color(0xFFB799FF), size: 16),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pay when you receive your order. No upfront payment required.',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -708,43 +1027,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
 
     try {
-      // Create order data
+      // Test backend connectivity first
+      final isBackendConnected = await _apiService.testBackendConnection();
+      if (!isBackendConnected) {
+        throw Exception(
+          'Backend server is not accessible. Please check if the server is running.',
+        );
+      }
+
+      // Create order data - match backend expectations
       final orderData = {
-        'items':
-            widget.cartItems
-                .map(
-                  (item) => {
-                    'guitarId': item['guitarId'],
-                    'quantity': item['quantity'],
-                    'price': item['price'],
-                  },
-                )
-                .toList(),
-        'shippingDetails': {
-          'name': _nameController.text,
-          'email': _emailController.text,
-          'phone': _phoneController.text,
+        'shippingAddress': {
+          'fullName': _nameController.text,
           'address': _addressController.text,
           'city': _cityController.text,
+          'state': _stateController.text,
           'postalCode': _postalCodeController.text,
+          'country': _countryController.text,
+          'phone': _phoneController.text,
         },
-        'paymentMethod': _selectedPaymentMethod,
-        'subtotal': _subtotal,
-        'shipping': _shippingCost,
-        'tax': _tax,
-        'total': _total,
+        'paymentMethod': 'stripe', // Use 'stripe' as the payment method
+        'notes': 'Order placed via mobile app with Stripe payment',
       };
+
+      print('Sending order data: $orderData'); // Debug log
 
       // Call API to create order
       final response = await _apiService.createOrder(orderData);
+
+      print('Order response status: ${response.statusCode}'); // Debug log
+      print('Order response data: ${response.data}'); // Debug log
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Clear cart after successful order
         await _apiService.clearCart();
 
         if (mounted) {
-          // Show success dialog
-          _showOrderSuccessDialog();
+          // Navigate to success screen for Stripe payments, show dialog for COD
+          if (_selectedPaymentMethod == 'Stripe') {
+            final orderId =
+                response.data['data']?['_id'] ??
+                'ORDER-${DateTime.now().millisecondsSinceEpoch}';
+            _navigateToSuccessScreen(orderId);
+          } else {
+            _showOrderSuccessDialog();
+          }
         }
       } else {
         if (mounted) {
@@ -759,6 +1086,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       }
     } catch (e) {
+      print('Order creation error: $e'); // Debug log
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -816,6 +1144,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             ],
           ),
+    );
+  }
+
+  void _navigateToSuccessScreen(String orderId) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder:
+            (context) => PaymentSuccessScreen(
+              orderId: orderId,
+              amount: _total,
+              paymentMethod: _selectedPaymentMethod,
+            ),
+      ),
     );
   }
 }

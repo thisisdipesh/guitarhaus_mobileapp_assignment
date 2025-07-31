@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/network/api_service.dart';
 import 'dart:ui';
+import '../my_orders_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -582,11 +583,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Orders feature coming soon!'),
-                  backgroundColor: Color(0xFFB799FF),
-                ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyOrdersScreen()),
               );
             },
           ),

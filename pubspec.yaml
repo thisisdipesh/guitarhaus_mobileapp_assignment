@@ -51,6 +51,8 @@ dependencies:
   json_annotation: ^4.9.0
   shared_preferences: ^2.5.3
   provider: ^6.0.5
+  flutter_stripe: ^11.5.0
+  webview_flutter: ^4.13.0
 
 dev_dependencies:
   flutter_native_splash: ^2.3.5

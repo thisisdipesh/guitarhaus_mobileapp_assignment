@@ -12,6 +12,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const fs = require('fs');
+require('dotenv').config();
+
 
 app.use(cors());
 app.options("*", cors());

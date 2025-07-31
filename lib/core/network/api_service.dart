@@ -204,6 +204,25 @@ class ApiService {
     return await _dio.get('/reviews/user');
   }
 
+  // Stripe Payment endpoints
+  Future<Response> createPaymentIntent(double amount, String currency) async {
+    return await _dio.post(
+      '/orders/create-payment-intent',
+      data: {'amount': amount, 'currency': currency},
+    );
+  }
+
+  Future<Response> createStripeCheckoutSession(String priceId) async {
+    return await _dio.post(
+      '/guitars/create-checkout-session',
+      data: {'priceId': priceId},
+    );
+  }
+
+  Future<Response> getStripeSession(String sessionId) async {
+    return await _dio.get('/guitars/session/$sessionId');
+  }
+
   // Helper method to set auth token
   void setAuthToken(String token) {
     _dio.options.headers['Authorization'] = 'Bearer $token';
@@ -212,5 +231,16 @@ class ApiService {
   // Helper method to clear auth token
   void clearAuthToken() {
     _dio.options.headers.remove('Authorization');
+  }
+
+  // Test backend connectivity
+  Future<bool> testBackendConnection() async {
+    try {
+      final response = await _dio.get('/guitars');
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Backend connection test failed: $e');
+      return false;
+    }
   }
 }

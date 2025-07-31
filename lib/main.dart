@@ -9,8 +9,20 @@ import 'features/auth/presentation/view/splash_screen.dart';
 import 'features/auth/presentation/view/bottom_navigation_screen/dashboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'features/auth/presentation/view/payment_success_screen.dart';
+import 'features/auth/presentation/view/my_orders_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Stripe with your publishable key
+  Stripe.publishableKey =
+      'pk_test_51Rq87wC14naaUubxN4WVucJdAozvCPrwSgdmzceKPC6Hzltw0TrLgWHTjNeBDxG5iQHCqlofgBOGbasQ5vsVBsx400Z4nkf6Fo';
+
+  // Configure Stripe settings
+  Stripe.merchantIdentifier = 'merchant.com.guitarhaus.app';
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => FavoritesProvider(),
@@ -37,6 +49,13 @@ class GuitarHaus extends StatelessWidget {
         '/favorites': (context) => FavoritesScreen(),
         '/profile': (context) => ProfileScreen(),
         '/cart': (context) => CartScreen(),
+        '/payment-success':
+            (context) => const PaymentSuccessScreen(
+              orderId: 'ORDER-123',
+              amount: 0.0,
+              paymentMethod: 'Stripe',
+            ),
+        '/my-orders': (context) => MyOrdersScreen(),
       },
     );
   }

@@ -3,6 +3,11 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Guitar = require("../models/Guitar");
 const { protect, authorize } = require("../middleware/auth");
+const { STRIPE_SECRET_KEY } = require('../config/db');
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+console.log(process.env.STRIPE_SECRET_KEY)
 
 // @desc    Create new order
 // @route   POST /api/v1/orders
@@ -94,6 +99,29 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     message: "Order created successfully",
     data: order
   });
+});
+
+// @desc    Create Stripe Payment Intent
+// @route   POST /api/v1/orders/create-payment-intent
+// @access  Public
+exports.createPaymentIntent = asyncHandler(async (req, res, next) => {
+  try {
+    const { amount, currency } = req.body;
+    if (!amount || !currency) {
+      return res.status(400).json({ success: false, message: 'Amount and currency are required' });
+    }
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe expects amount in cents
+      currency,
+      payment_method_types: ['card'],
+    });
+    res.status(200).json({
+      success: true,
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // @desc    Get user's orders
@@ -262,5 +290,23 @@ exports.cancelOrder = asyncHandler(async (req, res, next) => {
     success: true,
     message: "Order cancelled successfully",
     data: order
+  });
+});
+
+// @desc    Get my orders (current user)
+// @route   GET /api/v1/orders/my-orders
+// @access  Private
+exports.getMyOrders = asyncHandler(async (req, res, next) => {
+  const orders = await Order.find({ customer: req.user.id })
+    .populate({
+      path: 'items.guitar',
+      select: 'name brand price images'
+    })
+    .sort('-createdAt');
+
+  res.status(200).json({
+    success: true,
+    count: orders.length,
+    data: orders
   });
 }); 
