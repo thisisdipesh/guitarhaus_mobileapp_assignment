@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/network/api_service.dart';
 import 'dart:ui';
 import '../my_orders_screen.dart';
+import '../sensor_settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -586,6 +587,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => MyOrdersScreen()),
+              );
+            },
+          ),
+        ),
+
+        // Sensor Settings Button
+        Container(
+          width: double.infinity,
+          height: 60,
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Color(0xFFB799FF), width: 2),
+              ),
+            ),
+            icon: const Icon(
+              Icons.settings,
+              color: Color(0xFFB799FF),
+              size: 24,
+            ),
+            label: const Text(
+              "Sensor Settings",
+              style: TextStyle(
+                fontSize: 18,
+                color: Color(0xFFB799FF),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Ubuntu-Bold',
+              ),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SensorSettingsScreen(),
+                ),
               );
             },
           ),

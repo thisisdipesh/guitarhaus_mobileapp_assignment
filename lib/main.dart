@@ -12,6 +12,8 @@ import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'features/auth/presentation/view/payment_success_screen.dart';
 import 'features/auth/presentation/view/my_orders_screen.dart';
+import 'features/auth/presentation/view/sensor_settings_screen.dart';
+import 'features/auth/presentation/view/sensor_demo_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +58,8 @@ class GuitarHaus extends StatelessWidget {
               paymentMethod: 'Stripe',
             ),
         '/my-orders': (context) => MyOrdersScreen(),
+        '/sensor-settings': (context) => const SensorSettingsScreen(),
+        '/sensor-demo': (context) => const SensorDemoScreen(),
       },
     );
   }

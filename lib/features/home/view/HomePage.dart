@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 import '../../auth/presentation/view/featured_guitars_screen.dart';
+import '../../../core/services/sensor_service.dart';
 import 'dart:ui';
 
 class HomePage extends StatefulWidget {
@@ -13,11 +14,46 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // Remove guitars state, _fetchGuitars, and any guitar list UI from HomePage
   final ApiService _apiService = ApiService();
+  final SensorService _sensorService = SensorService();
 
   @override
   void initState() {
     super.initState();
+    _initializeSensors();
     // _fetchGuitars(); // This line is removed
+  }
+
+  void _initializeSensors() {
+    // Enable shake detection for refresh functionality
+    _sensorService.enableShakeDetection(() {
+      _onShakeDetected();
+    });
+  }
+
+  void _onShakeDetected() {
+    // Show refresh indicator and reload content
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.refresh, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Refreshing content...'),
+          ],
+        ),
+        backgroundColor: Colors.green[600],
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    // You can add actual refresh logic here
+    // For example, refresh featured guitars, reload data, etc.
+  }
+
+  @override
+  void dispose() {
+    _sensorService.dispose();
+    super.dispose();
   }
 
   // Future<void> _fetchGuitars() async { // This function is removed
