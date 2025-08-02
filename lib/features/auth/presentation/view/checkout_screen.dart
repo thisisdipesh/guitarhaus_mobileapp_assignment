@@ -40,9 +40,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String _selectedPaymentMethod = 'Stripe';
   bool _isLoading = false;
 
-  // Shipping cost
-  final double _shippingCost = 5.99;
-  final double _taxRate = 0.08; // 8% tax
+  // Shipping cost - REMOVED
+  final double _shippingCost = 0.0;
+  final double _taxRate = 0.0; // No tax
 
   @override
   void initState() {
@@ -273,7 +273,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<Map<String, dynamic>> fetchPaymentIntentClientSecret() async {
     final dio = Dio();
     final response = await dio.post(
-      'http://10.0.2.2:5000/api/v1/orders/create-payment-intent',
+      'http://10.0.2.2:3003/api/v1/orders/create-payment-intent',
       data: {
         'amount': _total, // amount in dollars
         'currency': 'usd',
@@ -477,7 +477,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } else {
       print("IMAGE PATH: $imagePath");
-      final imageUrl = 'http://10.0.2.2:5000/uploads/$imagePath';
+      // Add cache-busting query parameter to always fetch the latest image
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final imageUrl = 'http://10.0.2.2:3003/uploads/$imagePath?v=$cacheBuster';
       return Image.network(
         imageUrl,
         width: 50,
@@ -846,8 +848,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
                 const SizedBox(height: 16),
                 _buildTotalRow('Subtotal', _subtotal),
-                _buildTotalRow('Shipping', _shippingCost),
-                _buildTotalRow('Tax (8%)', _tax),
                 const Divider(color: Colors.white30, height: 24),
                 _buildTotalRow('Total', _total, isTotal: true),
               ],

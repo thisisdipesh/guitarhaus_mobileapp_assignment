@@ -11,7 +11,7 @@ void main() {
 
     group('Authentication Tests', () {
       test('should have correct base URL for Android emulator', () {
-        expect(ApiService.baseUrl, 'http://10.0.2.2:5000/api/v1');
+        expect(ApiService.baseUrl, 'http://10.0.2.2:3003/api/v1');
       });
 
       test('should have login method', () {

@@ -797,8 +797,9 @@ class _CartScreenState extends State<CartScreen> {
         );
       }
     } else {
-      // Construct the full URL for backend images
-      final fullUrl = 'http://10.0.2.2:5000/uploads/$imagePath';
+      // Construct the full URL for backend images with cache-busting
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final fullUrl = 'http://10.0.2.2:3003/uploads/$imagePath?v=$cacheBuster';
       print('Constructed full URL: $fullUrl');
       return buildImageWidget(fullUrl);
     }

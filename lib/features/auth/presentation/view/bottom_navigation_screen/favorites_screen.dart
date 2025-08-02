@@ -532,7 +532,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
       final imageUrl =
-          'http://10.0.2.2:5000/uploads/${images[0]}?v=$cacheBuster';
+          'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
       return Image.network(
         imageUrl,
         width: 70,

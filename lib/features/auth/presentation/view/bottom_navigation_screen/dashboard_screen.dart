@@ -729,7 +729,7 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
       final imageUrl =
-          'http://10.0.2.2:5000/uploads/${images[0]}?v=$cacheBuster';
+          'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
       print('🖼️ Image URL: $imageUrl');
       print('🖼️ Guitar ID: $id');
       print('🖼️ Images array: $images');
@@ -775,7 +775,9 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
 Widget _buildGuitarDetailImage(Map<String, dynamic> data) {
   final images = data['images'];
   if (images != null && images is List && images.isNotEmpty) {
-    final imageUrl = 'http://10.0.2.2:5000/uploads/${images[0]}';
+    // Add cache-busting query parameter to always fetch the latest image
+    final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+    final imageUrl = 'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
     return Image.network(
       imageUrl,
       width: 200,

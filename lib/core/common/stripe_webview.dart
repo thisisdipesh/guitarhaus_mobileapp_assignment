@@ -42,17 +42,51 @@ class _StripeWebViewState extends State<StripeWebView> {
                   _isLoading = false;
                 });
 
-                // Handle success/cancel URLs
-                if (url.contains('success')) {
+                print('Stripe WebView - Page finished: $url');
+
+                // Handle Stripe success/cancel URLs with more patterns
+                if (url.contains('success') ||
+                    url.contains('payment_intent_client_secret') ||
+                    url.contains('checkout/success') ||
+                    url.contains('return_url') ||
+                    url.contains('stripe.com/success')) {
+                  print('Stripe WebView - Success detected: $url');
                   widget.onSuccess?.call(url);
                   Navigator.of(context).pop();
-                } else if (url.contains('cancel')) {
+                } else if (url.contains('cancel') ||
+                    url.contains('checkout/cancel') ||
+                    url.contains('stripe.com/cancel')) {
+                  print('Stripe WebView - Cancel detected: $url');
                   widget.onCancel?.call(url);
                   Navigator.of(context).pop();
                 }
               },
               onNavigationRequest: (NavigationRequest request) {
-                // Handle navigation requests
+                print('Stripe WebView - Navigation request: ${request.url}');
+
+                // Handle Stripe redirects
+                if (request.url.contains('success') ||
+                    request.url.contains('payment_intent_client_secret') ||
+                    request.url.contains('checkout/success') ||
+                    request.url.contains('return_url') ||
+                    request.url.contains('stripe.com/success')) {
+                  print(
+                    'Stripe WebView - Success redirect detected: ${request.url}',
+                  );
+                  widget.onSuccess?.call(request.url);
+                  Navigator.of(context).pop();
+                  return NavigationDecision.prevent;
+                } else if (request.url.contains('cancel') ||
+                    request.url.contains('checkout/cancel') ||
+                    request.url.contains('stripe.com/cancel')) {
+                  print(
+                    'Stripe WebView - Cancel redirect detected: ${request.url}',
+                  );
+                  widget.onCancel?.call(request.url);
+                  Navigator.of(context).pop();
+                  return NavigationDecision.prevent;
+                }
+
                 return NavigationDecision.navigate;
               },
             ),
