@@ -50,8 +50,9 @@ void main() {
           });
           expect(sensorService.isShakeDetectionEnabled, true);
         } catch (e) {
-          // Handle binding initialization error in test environment
+          // Handle missing plugin implementation in test environment
           expect(sensorService.enableShakeDetection, isA<Function>());
+          expect(sensorService.isShakeDetectionEnabled, false);
         }
       });
 
@@ -61,8 +62,9 @@ void main() {
           sensorService.disableShakeDetection();
           expect(sensorService.isShakeDetectionEnabled, false);
         } catch (e) {
-          // Handle binding initialization error in test environment
+          // Handle missing plugin implementation in test environment
           expect(sensorService.disableShakeDetection, isA<Function>());
+          expect(sensorService.isShakeDetectionEnabled, false);
         }
       });
 
@@ -75,8 +77,9 @@ void main() {
           expect(sensorService.isShakeDetectionEnabled, true);
           sensorService.disableShakeDetection();
         } catch (e) {
-          // Handle binding initialization error in test environment
+          // Handle missing plugin implementation in test environment
           expect(sensorService.enableShakeDetection, isA<Function>());
+          expect(sensorService.isShakeDetectionEnabled, false);
         }
       });
     });
@@ -88,8 +91,10 @@ void main() {
           sensorService.dispose();
           expect(sensorService.isShakeDetectionEnabled, false);
         } catch (e) {
-          // Handle binding initialization error in test environment
+          // Handle missing plugin implementation in test environment
           expect(sensorService.dispose, isA<Function>());
+          // When plugin fails, shake detection should remain disabled
+          expect(sensorService.isShakeDetectionEnabled, false);
         }
       });
 

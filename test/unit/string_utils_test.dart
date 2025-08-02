@@ -49,11 +49,11 @@ class StringUtils {
   }
 
   static bool containsOnlyLetters(String text) {
-    return RegExp(r'^[a-zA-Z\s]+$').hasMatch(text);
+    return RegExp(r'^[a-zA-Z\s]*$').hasMatch(text);
   }
 
   static bool containsOnlyNumbers(String text) {
-    return RegExp(r'^[0-9]+$').hasMatch(text);
+    return RegExp(r'^[0-9]*$').hasMatch(text);
   }
 
   static String extractNumbers(String text) {
@@ -65,9 +65,10 @@ class StringUtils {
   }
 
   static bool isValidUrl(String url) {
+    if (url.isEmpty) return false;
     try {
-      Uri.parse(url);
-      return true;
+      final uri = Uri.parse(url);
+      return uri.hasScheme && uri.hasAuthority;
     } catch (e) {
       return false;
     }
@@ -207,6 +208,8 @@ void main() {
         expect(StringUtils.isValidUrl('http://test.org'), true);
         expect(StringUtils.isValidUrl('invalid-url'), false);
         expect(StringUtils.isValidUrl(''), false);
+        // Test with valid URL that might be incorrectly flagged
+        expect(StringUtils.isValidUrl('https://test.com'), true);
       });
     });
 

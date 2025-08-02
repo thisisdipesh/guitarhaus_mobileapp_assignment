@@ -1,8 +1,8 @@
-# 🎸 GuitarHaus - High Quality Guitar Store
+#  GuitarHaus - High Quality Guitar Store
 
 A complete e-commerce solution for selling high-quality guitars, featuring a Flutter mobile app with a Node.js backend API.
 
-## 📱 Project Overview
+##  Project Overview
 
 GuitarHaus is a comprehensive guitar store application with:
 
@@ -10,7 +10,7 @@ GuitarHaus is a comprehensive guitar store application with:
 - **Node.js Backend**: RESTful API with MongoDB database
 - **Full E-commerce Features**: Authentication, Product catalog, Shopping cart, Orders, Wishlist, Reviews
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Frontend (Flutter)
 - **Clean Architecture**: Feature-based organization with proper separation of concerns
@@ -27,7 +27,7 @@ GuitarHaus is a comprehensive guitar store application with:
 - **File Upload**: Multer for image uploads
 - **Security**: Helmet, XSS protection, CORS, MongoDB sanitization
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Flutter SDK (3.7.2+)
@@ -68,15 +68,15 @@ flutter pub get
 flutter run
 ```
 
-## 📊 Features
+##  Features
 
-### 🔐 Authentication
+###  Authentication
 - User registration and login
 - JWT token management
 - Role-based access control (Admin/Customer)
 - Secure password hashing with bcrypt
 
-### 🎸 Guitar Catalog
+###  Guitar Catalog
 - Browse guitars by category (Electric, Acoustic, Bass, Classical, Ukulele)
 - Search and filtering capabilities
 - Detailed guitar specifications
@@ -90,18 +90,18 @@ flutter run
 - Order management
 - Real-time stock tracking
 
-### 👤 User Profile
+### User Profile
 - View and edit profile information
 - Order history
 - Review management
 - Secure logout
 
-### ⭐ Reviews & Ratings
+###  Reviews & Ratings
 - Customer reviews for guitars
 - Rating system
 - Review management
 
-## 🛠️ API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/v1/auth/login` - User login
@@ -232,7 +232,7 @@ The backend includes sample data:
 - **Categories**: Electric, Acoustic, Bass, Classical, Ukulele
 - **Realistic Pricing**: $59.99 - $3,299.99 range
 
-## 🚀 Deployment
+##  Deployment
 
 ### Backend Deployment
 1. Set `NODE_ENV=production`
@@ -317,11 +317,11 @@ JWT_COOKIE_EXPIRE=30
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License.
 
-## 📞 Support
+##  Support
 
 For issues or questions:
 1. Check the troubleshooting section

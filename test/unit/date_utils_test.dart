@@ -41,8 +41,11 @@ class DateUtils {
 
   static bool isThisWeek(DateTime date) {
     final now = DateTime.now();
+    // Get the start of the current week (Monday)
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    // Get the end of the current week (Sunday)
     final endOfWeek = startOfWeek.add(const Duration(days: 6));
+    // Check if the date is within the current week
     return date.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
         date.isBefore(endOfWeek.add(const Duration(days: 1)));
   }
@@ -197,8 +200,13 @@ void main() {
       });
 
       test('should identify this week', () {
-        final thisWeek = DateTime.now().add(const Duration(days: 2));
-        expect(DateUtils.isThisWeek(thisWeek), true);
+        final today = DateTime.now();
+        // Test with today's date which should always be in this week
+        expect(DateUtils.isThisWeek(today), true);
+
+        // Test with yesterday which should also be in this week
+        final yesterday = today.subtract(const Duration(days: 1));
+        expect(DateUtils.isThisWeek(yesterday), true);
       });
 
       test('should identify this month', () {
