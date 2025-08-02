@@ -400,7 +400,7 @@ class _GuitarScreenState extends State<GuitarScreen> {
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
       final imageUrl =
-          'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
+          'http://10.0.2.2:5000/uploads/${images[0]}?v=$cacheBuster';
       print('DEBUG: Guitar ${guitar['name']} image URL: $imageUrl');
       return Image.network(
         imageUrl,

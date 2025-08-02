@@ -24,14 +24,14 @@ class _ImageLoadingTestState extends State<ImageLoadingTest> {
       // Test 1: Check if server is reachable
       print('🔍 Testing server connectivity...');
       final serverResponse = await dio.get(
-        'http://10.0.2.2:3000/api/v1/test-images',
+        'http://10.0.2.2:5000/api/v1/test-images',
       );
       print('✅ Server response: ${serverResponse.statusCode}');
 
       // Test 2: Check specific image
       print('🔍 Testing image loading...');
       final imageResponse = await dio.get(
-        'http://10.0.2.2:3000/uploads/IMG-1752931327664.jpg',
+        'http://10.0.2.2:5000/uploads/IMG-1752931327664.jpg',
       );
       print('✅ Image response: ${imageResponse.statusCode}');
       print('✅ Image content length: ${imageResponse.data.length}');
@@ -82,7 +82,7 @@ class _ImageLoadingTestState extends State<ImageLoadingTest> {
             const SizedBox(height: 20),
             const Text('Testing network image loading:'),
             Image.network(
-              'http://10.0.2.2:3000/uploads/IMG-1752931327664.jpg',
+              'http://10.0.2.2:5000/uploads/IMG-1752931327664.jpg',
               width: 200,
               height: 200,
               fit: BoxFit.cover,

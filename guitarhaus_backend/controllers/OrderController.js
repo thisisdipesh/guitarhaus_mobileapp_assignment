@@ -3,11 +3,16 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Guitar = require("../models/Guitar");
 const { protect, authorize } = require("../middleware/auth");
-const { STRIPE_SECRET_KEY } = require('../config/db');
 const Stripe = require('stripe');
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-console.log(process.env.STRIPE_SECRET_KEY)
+// Initialize Stripe only if secret key is provided
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY !== 'sk_test_51OQXXXXXXXXXXXXX') {
+  stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+  console.log('Stripe initialized successfully');
+} else {
+  console.log('Stripe not configured - using test mode');
+}
 
 // @desc    Create new order
 // @route   POST /api/v1/orders
@@ -110,6 +115,15 @@ exports.createPaymentIntent = asyncHandler(async (req, res, next) => {
     if (!amount || !currency) {
       return res.status(400).json({ success: false, message: 'Amount and currency are required' });
     }
+    
+    // Check if Stripe is configured
+    if (!stripe) {
+      return res.status(503).json({ 
+        success: false, 
+        message: 'Payment processing is not configured. Please contact support.' 
+      });
+    }
+    
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Stripe expects amount in cents
       currency,

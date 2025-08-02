@@ -273,7 +273,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<Map<String, dynamic>> fetchPaymentIntentClientSecret() async {
     final dio = Dio();
     final response = await dio.post(
-      'http://10.0.2.2:3000/api/v1/orders/create-payment-intent',
+      'http://10.0.2.2:5000/api/v1/orders/create-payment-intent',
       data: {
         'amount': _total, // amount in dollars
         'currency': 'usd',
@@ -477,7 +477,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } else {
       print("IMAGE PATH: $imagePath");
-      final imageUrl = 'http://10.0.2.2:3000/uploads/$imagePath';
+      final imageUrl = 'http://10.0.2.2:5000/uploads/$imagePath';
       return Image.network(
         imageUrl,
         width: 50,

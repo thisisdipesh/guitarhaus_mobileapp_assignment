@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StripePaymentService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/v1';
+  static const String baseUrl = 'http://10.0.2.2:5000/api/v1';
   late Dio _dio;
 
   StripePaymentService() {

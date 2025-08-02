@@ -76,22 +76,27 @@ Backend API for GuitarHaus - High Quality Guitar Store
 npm install
 ```
 
-2. Create `.env` file in `config/` directory:
+2. Set up environment variables:
+   - Copy `config/config.env.example` to `config/config.env`
+   - Update the values in `config/config.env` with your actual configuration
+
+3. Required environment variables:
 ```env
 NODE_ENV=development
-PORT=3000
+PORT=3003
 LOCAL_DATABASE_URI=mongodb://127.0.0.1:27017/guitarhaus_db
-FILE_UPLOAD_PATH=./public/uploads
-MAX_FILE_UPLOAD=20000
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRE=30d
-JWT_COOKIE_EXPIRE=30
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 ```
 
-3. Start the server:
+4. Start the server:
 ```bash
-npm run dev
+npm start
 ```
+
+**Note**: The app will work without Stripe configuration, but payment features will be disabled.
 
 ## Database Models
 

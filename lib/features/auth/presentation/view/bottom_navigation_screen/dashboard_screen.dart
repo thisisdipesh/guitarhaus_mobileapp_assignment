@@ -11,8 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'guitar_screen.dart';
 
-
-
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -731,7 +729,7 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
       final imageUrl =
-          'http://10.0.2.2:3000/uploads/${images[0]}?v=$cacheBuster';
+          'http://10.0.2.2:5000/uploads/${images[0]}?v=$cacheBuster';
       print('🖼️ Image URL: $imageUrl');
       print('🖼️ Guitar ID: $id');
       print('🖼️ Images array: $images');
@@ -777,7 +775,7 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
 Widget _buildGuitarDetailImage(Map<String, dynamic> data) {
   final images = data['images'];
   if (images != null && images is List && images.isNotEmpty) {
-    final imageUrl = 'http://10.0.2.2:3000/uploads/${images[0]}';
+    final imageUrl = 'http://10.0.2.2:5000/uploads/${images[0]}';
     return Image.network(
       imageUrl,
       width: 200,

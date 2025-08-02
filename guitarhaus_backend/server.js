@@ -15,8 +15,26 @@ const fs = require('fs');
 require('dotenv').config();
 
 
-app.use(cors());
-app.options("*", cors());
+// Configure CORS for mobile app and web app
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:3003'];
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for development
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Load env file
 dotenv.config({
@@ -55,14 +73,11 @@ app.use(helmet());
 // Prevent XSS attacks
 app.use(xss());
 
-// CORS headers for all requests
+// Additional CORS headers for mobile app compatibility
 app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
 

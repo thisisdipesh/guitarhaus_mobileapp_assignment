@@ -798,7 +798,7 @@ class _CartScreenState extends State<CartScreen> {
       }
     } else {
       // Construct the full URL for backend images
-      final fullUrl = 'http://10.0.2.2:3000/uploads/$imagePath';
+      final fullUrl = 'http://10.0.2.2:5000/uploads/$imagePath';
       print('Constructed full URL: $fullUrl');
       return buildImageWidget(fullUrl);
     }
