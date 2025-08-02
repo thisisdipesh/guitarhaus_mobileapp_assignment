@@ -1,47 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/login_screen.dart';
+import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/signup_screen.dart';
 
 void main() {
-  group('Login Screen Widget Tests', () {
-    testWidgets('Login screen should render without crashing', (
+  group('Signup Screen Widget Tests', () {
+    testWidgets('Signup screen should render without crashing', (
       WidgetTester tester,
     ) async {
       // Create the widget without pumping to avoid layout issues
-      const loginScreen = LoginScreen();
+      const signupScreen = SignupScreen();
 
       // Just verify the widget can be created
-      expect(loginScreen, isA<LoginScreen>());
+      expect(signupScreen, isA<SignupScreen>());
     });
 
-    testWidgets('Login screen should have basic structure', (
+    testWidgets('Signup screen should have basic structure', (
       WidgetTester tester,
     ) async {
       // Create the widget without pumping to avoid layout issues
-      const loginScreen = LoginScreen();
+      const signupScreen = SignupScreen();
 
       // Just verify the widget can be created
-      expect(loginScreen, isA<LoginScreen>());
+      expect(signupScreen, isA<SignupScreen>());
     });
 
-    testWidgets('Login screen should have form fields', (
+    testWidgets('Signup screen should have form fields', (
       WidgetTester tester,
     ) async {
       // Create the widget without pumping to avoid layout issues
-      const loginScreen = LoginScreen();
+      const signupScreen = SignupScreen();
 
       // Just verify the widget can be created
-      expect(loginScreen, isA<LoginScreen>());
+      expect(signupScreen, isA<SignupScreen>());
     });
 
-    testWidgets('Login screen should have buttons', (
+    testWidgets('Signup screen should have buttons', (
       WidgetTester tester,
     ) async {
       // Create the widget without pumping to avoid layout issues
-      const loginScreen = LoginScreen();
+      const signupScreen = SignupScreen();
 
       // Just verify the widget can be created
-      expect(loginScreen, isA<LoginScreen>());
+      expect(signupScreen, isA<SignupScreen>());
     });
   });
 }
