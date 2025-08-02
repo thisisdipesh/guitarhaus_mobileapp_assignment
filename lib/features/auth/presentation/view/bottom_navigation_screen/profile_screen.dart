@@ -5,6 +5,7 @@ import '../../../../../core/network/api_service.dart';
 import 'dart:ui';
 import '../my_orders_screen.dart';
 import '../sensor_settings_screen.dart';
+import '../edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -545,13 +546,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 fontFamily: 'Ubuntu-Bold',
               ),
             ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Edit profile feature coming soon!'),
-                  backgroundColor: Color(0xFFB799FF),
-                ),
-              );
+            onPressed: () async {
+              if (userProfile != null) {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            EditProfileScreen(userProfile: userProfile!),
+                  ),
+                );
+
+                // Refresh profile data if update was successful
+                if (result == true) {
+                  _loadUserProfile();
+                }
+              }
             },
           ),
         ),

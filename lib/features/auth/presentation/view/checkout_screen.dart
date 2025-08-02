@@ -447,8 +447,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _buildItemImage(String imagePath) {
     if (imagePath.startsWith('http') || imagePath.startsWith('assets/')) {
       if (imagePath.startsWith('http')) {
+        // Convert localhost to 10.0.2.2 for Android emulator
+        String fullUrl = imagePath;
+        if (fullUrl.contains('localhost:3003')) {
+          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+        }
         return Image.network(
-          imagePath,
+          fullUrl,
           width: 50,
           height: 50,
           fit: BoxFit.cover,
@@ -942,7 +947,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Secure payment powered by Stripe. Your payment information is encrypted and secure.',
+                    'Your payment information is encrypted and secure.',
                     style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ),

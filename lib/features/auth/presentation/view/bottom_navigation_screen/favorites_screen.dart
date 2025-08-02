@@ -531,8 +531,20 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     if (images != null && images is List && images.isNotEmpty) {
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
-      final imageUrl =
-          'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
+
+      // Check if the image URL is already a full URL or just a filename
+      String imageUrl;
+      if (images[0].toString().startsWith('http')) {
+        // It's already a full URL, but need to convert localhost to 10.0.2.2 for Android emulator
+        String fullUrl = images[0].toString();
+        if (fullUrl.contains('localhost:3003')) {
+          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+        }
+        imageUrl = '$fullUrl?v=$cacheBuster';
+      } else {
+        // It's just a filename, construct the full URL
+        imageUrl = 'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
+      }
       return Image.network(
         imageUrl,
         width: 70,

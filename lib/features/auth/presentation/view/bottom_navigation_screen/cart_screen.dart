@@ -770,8 +770,13 @@ class _CartScreenState extends State<CartScreen> {
     if (imagePath.startsWith('http') || imagePath.startsWith('assets/')) {
       // If it's already a full URL or asset path, use it as is
       if (imagePath.startsWith('http')) {
-        print('Using network image: $imagePath');
-        return buildImageWidget(imagePath);
+        // Convert localhost to 10.0.2.2 for Android emulator
+        String fullUrl = imagePath;
+        if (fullUrl.contains('localhost:3003')) {
+          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+        }
+        print('Using network image: $fullUrl');
+        return buildImageWidget(fullUrl);
       } else {
         // Asset image
         return Image.asset(

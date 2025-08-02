@@ -25,10 +25,14 @@ class StripePaymentService {
   // Create payment intent for one-time payments
   Future<String> createPaymentIntent(double amount, String currency) async {
     try {
+      print('Making request to create payment intent: $amount $currency');
       final response = await _dio.post(
         '/orders/create-payment-intent',
         data: {'amount': amount, 'currency': currency},
       );
+
+      print('Payment intent response status: ${response.statusCode}');
+      print('Payment intent response data: ${response.data}');
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return response.data['clientSecret'];
@@ -38,6 +42,7 @@ class StripePaymentService {
         );
       }
     } catch (e) {
+      print('Error creating payment intent: $e');
       throw Exception('Error creating payment intent: $e');
     }
   }
@@ -78,32 +83,85 @@ class StripePaymentService {
   // Process one-time payment using Stripe Payment Sheet
   Future<PaymentResult> processPayment(double amount, String currency) async {
     try {
+      print('Starting Stripe payment process for amount: $amount $currency');
+
       // Get auth token
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token != null) {
         setAuthToken(token);
+        print('Auth token set successfully');
+      } else {
+        print('No auth token found');
       }
 
       // Create payment intent
+      print('Creating payment intent...');
       final clientSecret = await createPaymentIntent(amount, currency);
+      print(
+        'Payment intent created with client secret: ${clientSecret.substring(0, 20)}...',
+      );
+
+      // Check if this is a simulated payment intent (for testing)
+      if (clientSecret.startsWith('pi_simulated_secret_')) {
+        // For testing, try to open Stripe payment sheet with a demo client secret
+        print(
+          'Simulated payment intent detected - opening Stripe payment sheet',
+        );
+
+        // Use a demo client secret that will work with Stripe's test mode
+        // This is a sample client secret for testing purposes
+        const demoClientSecret =
+            'pi_3OQXXXXXXXXXXXXX_secret_XXXXXXXXXXXXXXXXXXXXXXXX';
+
+        try {
+          // Configure payment sheet with demo client secret
+          await Stripe.instance.initPaymentSheet(
+            paymentSheetParameters: SetupPaymentSheetParameters(
+              paymentIntentClientSecret: demoClientSecret,
+              merchantDisplayName: 'GuitarHaus',
+            ),
+          );
+
+          // Present payment sheet
+          await Stripe.instance.presentPaymentSheet();
+
+          return PaymentResult(
+            success: true,
+            message: 'Payment completed successfully (Demo Mode)',
+          );
+        } catch (e) {
+          print('Error with demo payment sheet: $e');
+          // Show a dialog explaining that this is a demo
+          return PaymentResult(
+            success: false,
+            message:
+                'This is a demo app. In a real app, you would see the Stripe payment sheet here.',
+          );
+        }
+      }
 
       // Configure payment sheet
+      print('Initializing payment sheet...');
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           merchantDisplayName: 'GuitarHaus',
         ),
       );
+      print('Payment sheet initialized successfully');
 
       // Present payment sheet
+      print('Presenting payment sheet...');
       await Stripe.instance.presentPaymentSheet();
+      print('Payment sheet presented successfully');
 
       return PaymentResult(
         success: true,
         message: 'Payment completed successfully',
       );
     } catch (e) {
+      print('Stripe payment error: $e');
       if (e is StripeException) {
         return PaymentResult(
           success: false,

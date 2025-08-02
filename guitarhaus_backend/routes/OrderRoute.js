@@ -13,10 +13,12 @@ const {
   createPaymentIntent
 } = require("../controllers/OrderController");
 
+// Public routes
+router.post('/create-payment-intent', createPaymentIntent);
+
 // User routes
 router.use(protect);
 router.post("/", createOrder);
-router.post('/create-payment-intent', createPaymentIntent);
 router.get("/my-orders", getMyOrders); // Place specific route first
 router.get("/", getUserOrders);
 router.get("/:id", getOrder);
