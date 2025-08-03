@@ -3,15 +3,15 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StripePaymentService {
-  static const String baseUrl = 'http://10.0.2.2:3003/api/v1';
+  static const String baseUrl = 'http://172.20.10.2:3003/api/v1';
   late Dio _dio;
 
   StripePaymentService() {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
         headers: {'Content-Type': 'application/json'},
       ),
     );
@@ -104,21 +104,16 @@ class StripePaymentService {
 
       // Check if this is a simulated payment intent (for testing)
       if (clientSecret.startsWith('pi_simulated_secret_')) {
-        // For testing, try to open Stripe payment sheet with a demo client secret
         print(
-          'Simulated payment intent detected - opening Stripe payment sheet',
+          'Simulated payment intent detected - using actual Stripe test mode',
         );
 
-        // Use a demo client secret that will work with Stripe's test mode
-        // This is a sample client secret for testing purposes
-        const demoClientSecret =
-            'pi_3OQXXXXXXXXXXXXX_secret_XXXXXXXXXXXXXXXXXXXXXXXX';
-
+        // For testing, create a real payment intent with Stripe's test mode
         try {
-          // Configure payment sheet with demo client secret
+          // Configure payment sheet with the actual client secret from backend
           await Stripe.instance.initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
-              paymentIntentClientSecret: demoClientSecret,
+              paymentIntentClientSecret: clientSecret,
               merchantDisplayName: 'GuitarHaus',
             ),
           );
@@ -128,16 +123,11 @@ class StripePaymentService {
 
           return PaymentResult(
             success: true,
-            message: 'Payment completed successfully (Demo Mode)',
+            message: 'Payment completed successfully (Test Mode)',
           );
         } catch (e) {
-          print('Error with demo payment sheet: $e');
-          // Show a dialog explaining that this is a demo
-          return PaymentResult(
-            success: false,
-            message:
-                'This is a demo app. In a real app, you would see the Stripe payment sheet here.',
-          );
+          print('Error with payment sheet: $e');
+          return PaymentResult(success: false, message: 'Payment failed: $e');
         }
       }
 

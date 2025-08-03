@@ -273,7 +273,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<Map<String, dynamic>> fetchPaymentIntentClientSecret() async {
     final dio = Dio();
     final response = await dio.post(
-      'http://10.0.2.2:3003/api/v1/orders/create-payment-intent',
+      'http://172.20.10.2:3003/api/v1/orders/create-payment-intent',
       data: {
         'amount': _total, // amount in dollars
         'currency': 'usd',
@@ -447,10 +447,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget _buildItemImage(String imagePath) {
     if (imagePath.startsWith('http') || imagePath.startsWith('assets/')) {
       if (imagePath.startsWith('http')) {
-        // Convert localhost to 10.0.2.2 for Android emulator
+        // Convert localhost to 172.20.10.2 for local network
         String fullUrl = imagePath;
         if (fullUrl.contains('localhost:3003')) {
-          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+          fullUrl = fullUrl.replaceAll('localhost:3003', '172.20.10.2:3003');
+        }
+        if (fullUrl.contains('10.0.2.2:3003')) {
+          fullUrl = fullUrl.replaceAll('10.0.2.2:3003', '172.20.10.2:3003');
         }
         return Image.network(
           fullUrl,
@@ -484,7 +487,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       print("IMAGE PATH: $imagePath");
       // Add cache-busting query parameter to always fetch the latest image
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
-      final imageUrl = 'http://10.0.2.2:3003/uploads/$imagePath?v=$cacheBuster';
+      final imageUrl =
+          'http://172.20.10.2:3003/uploads/$imagePath?v=$cacheBuster';
       return Image.network(
         imageUrl,
         width: 50,

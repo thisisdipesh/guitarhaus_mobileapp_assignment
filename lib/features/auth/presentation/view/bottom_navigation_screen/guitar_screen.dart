@@ -5,6 +5,7 @@ import 'package:guitarhaus_mobileapp_assignment/core/network/api_service.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/cart_screen.dart';
 import 'package:guitarhaus_mobileapp_assignment/features/auth/presentation/view/bottom_navigation_screen/favorites_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:guitarhaus_mobileapp_assignment/core/services/sensor_service.dart';
 import 'dart:ui';
 
 class GuitarScreen extends StatefulWidget {
@@ -19,12 +20,15 @@ class _GuitarScreenState extends State<GuitarScreen> {
   bool isGuitarsLoading = false;
   String? guitarsError;
   final ApiService _apiService = ApiService();
+  final SensorService _sensorService = SensorService();
+  bool _isShakeEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _initializeAuthToken();
     _fetchGuitars();
+    _initializeShakeDetection();
   }
 
   Future<void> _initializeAuthToken() async {
@@ -33,6 +37,42 @@ class _GuitarScreenState extends State<GuitarScreen> {
     if (token != null) {
       _apiService.setAuthToken(token);
     }
+  }
+
+  void _initializeShakeDetection() {
+    // Enable shake detection with refresh callback
+    _sensorService.enableShakeDetection(_onShakeDetected);
+    setState(() {
+      _isShakeEnabled = true;
+    });
+    print('Shake detection enabled for guitar screen');
+  }
+
+  void _onShakeDetected() {
+    print('Shake detected! Refreshing guitar list...');
+    _fetchGuitars();
+
+    // Show a snackbar to indicate refresh
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('🔄 Refreshing guitar list...'),
+          backgroundColor: const Color(0xFFB799FF),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _sensorService.disableShakeDetection();
+    super.dispose();
   }
 
   Future<void> _fetchGuitars() async {
@@ -115,6 +155,53 @@ class _GuitarScreenState extends State<GuitarScreen> {
       );
     }
     return Scaffold(
+      backgroundColor: const Color(0xFF102840),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF102840),
+        elevation: 0,
+        title: const Text(
+          'Guitars',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontFamily: 'Ubuntu-Bold',
+          ),
+        ),
+        actions: [
+          // Shake indicator
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFB799FF).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFFB799FF).withOpacity(0.5),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.screen_rotation,
+                  color: const Color(0xFFB799FF),
+                  size: 16,
+                ),
+                const SizedBox(width: 4),
+                const Text(
+                  'Shake to refresh',
+                  style: TextStyle(
+                    color: Color(0xFFB799FF),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         // Remove RefreshIndicator to disable pull-to-refresh
         child: Padding(
@@ -221,109 +308,60 @@ class _GuitarScreenState extends State<GuitarScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      '\u20B9${guitar['price']}',
-                                      style: const TextStyle(
-                                        color: Color(0xFFFFD700),
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Ubuntu-Bold',
-                                        fontSize: 18,
+                                    Expanded(
+                                      child: Text(
+                                        '\u20B9${guitar['price']}',
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFD700),
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Ubuntu-Bold',
+                                          fontSize: 18,
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      icon: Icon(
-                                        context
-                                                .watch<FavoritesProvider>()
-                                                .isFavorite(guitar['id'])
-                                            ? Icons.favorite
-                                            : Icons.favorite_border,
-                                        color:
-                                            context
-                                                    .watch<FavoritesProvider>()
-                                                    .isFavorite(guitar['id'])
-                                                ? Colors.redAccent
-                                                : Color(0xFFB799FF),
+                                    Container(
+                                      constraints: const BoxConstraints(
+                                        minWidth: 32,
+                                        minHeight: 32,
                                       ),
-                                      onPressed: () {
-                                        final provider =
-                                            context.read<FavoritesProvider>();
-                                        if (provider.isFavorite(guitar['id'])) {
-                                          provider.removeFavorite(guitar['id']);
-                                        } else {
-                                          provider.addFavorite(guitar);
-                                          // Show SnackBar when added to favorites
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Added to favorites',
-                                              ),
-                                              backgroundColor: Color(
-                                                0xFFB799FF,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      tooltip:
+                                      child: IconButton(
+                                        icon: Icon(
                                           context
                                                   .watch<FavoritesProvider>()
                                                   .isFavorite(guitar['id'])
-                                              ? 'Remove from favorites'
-                                              : 'Add to favorites',
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.shopping_cart,
-                                        color: Color(0xFF8F43EE),
-                                      ),
-                                      onPressed: () async {
-                                        try {
-                                          final response = await _apiService
-                                              .addToCart(guitar['id'], 1);
-                                          print(
-                                            'Add to cart response: ${response.data}',
-                                          );
-                                          if (response.statusCode == 200 ||
-                                              response.statusCode == 201) {
-                                            if (mounted) {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (context) =>
-                                                          const CartScreen(),
-                                                ),
-                                              );
-                                            }
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color:
+                                              context
+                                                      .watch<
+                                                        FavoritesProvider
+                                                      >()
+                                                      .isFavorite(guitar['id'])
+                                                  ? Colors.redAccent
+                                                  : Color(0xFFB799FF),
+                                          size: 16,
+                                        ),
+                                        onPressed: () {
+                                          final provider =
+                                              context.read<FavoritesProvider>();
+                                          if (provider.isFavorite(
+                                            guitar['id'],
+                                          )) {
+                                            provider.removeFavorite(
+                                              guitar['id'],
+                                            );
                                           } else {
-                                            if (mounted) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'Failed to add to cart: '
-                                                    '${response.data['message'] ?? 'Unknown error'}',
-                                                  ),
-                                                  backgroundColor: const Color(
-                                                    0xFFB799FF,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        } catch (e) {
-                                          if (mounted) {
+                                            provider.addFavorite(guitar);
+                                            // Show SnackBar when added to favorites
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-                                                  'Failed to add to cart!',
+                                                  'Added to favorites',
                                                 ),
                                                 backgroundColor: Color(
                                                   0xFFB799FF,
@@ -331,22 +369,116 @@ class _GuitarScreenState extends State<GuitarScreen> {
                                               ),
                                             );
                                           }
-                                        }
-                                      },
-                                      tooltip: 'Add to cart',
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.visibility,
-                                        color: Color(0xFFB799FF),
+                                        },
+                                        tooltip:
+                                            context
+                                                    .watch<FavoritesProvider>()
+                                                    .isFavorite(guitar['id'])
+                                                ? 'Remove from favorites'
+                                                : 'Add to favorites',
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
                                       ),
-                                      onPressed:
-                                          () => _showQuickView(
-                                            context,
-                                            guitar,
-                                            index,
-                                          ),
-                                      tooltip: 'Quick view',
+                                    ),
+                                    Container(
+                                      constraints: const BoxConstraints(
+                                        minWidth: 32,
+                                        minHeight: 32,
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.shopping_cart,
+                                          color: Color(0xFF8F43EE),
+                                          size: 16,
+                                        ),
+                                        onPressed: () async {
+                                          try {
+                                            final response = await _apiService
+                                                .addToCart(guitar['id'], 1);
+                                            print(
+                                              'Add to cart response: ${response.data}',
+                                            );
+                                            if (response.statusCode == 200 ||
+                                                response.statusCode == 201) {
+                                              if (mounted) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (context) =>
+                                                            const CartScreen(),
+                                                  ),
+                                                );
+                                              }
+                                            } else {
+                                              if (mounted) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Failed to add to cart: '
+                                                      '${response.data['message'] ?? 'Unknown error'}',
+                                                    ),
+                                                    backgroundColor:
+                                                        const Color(0xFFB799FF),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          } catch (e) {
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Failed to add to cart!',
+                                                  ),
+                                                  backgroundColor: Color(
+                                                    0xFFB799FF,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                        tooltip: 'Add to cart',
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      constraints: const BoxConstraints(
+                                        minWidth: 32,
+                                        minHeight: 32,
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.visibility,
+                                          color: Color(0xFFB799FF),
+                                          size: 16,
+                                        ),
+                                        onPressed:
+                                            () => _showQuickView(
+                                              context,
+                                              guitar,
+                                              index,
+                                            ),
+                                        tooltip: 'Quick view',
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -403,15 +535,16 @@ class _GuitarScreenState extends State<GuitarScreen> {
       // Check if the image URL is already a full URL or just a filename
       String imageUrl;
       if (images[0].toString().startsWith('http')) {
-        // It's already a full URL, but need to convert localhost to 10.0.2.2 for Android emulator
+        // It's already a full URL, but need to convert localhost to the correct IP for the device
         String fullUrl = images[0].toString();
         if (fullUrl.contains('localhost:3003')) {
-          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+          fullUrl = fullUrl.replaceAll('localhost:3003', '172.20.10.2:3003');
         }
         imageUrl = '$fullUrl?v=$cacheBuster';
       } else {
         // It's just a filename, construct the full URL
-        imageUrl = 'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
+        imageUrl =
+            'http://172.20.10.2:3003/uploads/${images[0]}?v=$cacheBuster';
       }
 
       print('DEBUG: Guitar ${guitar['name']} image URL: $imageUrl');
@@ -862,11 +995,11 @@ class _GuitarScreenState extends State<GuitarScreen> {
     // Convert localhost to 10.0.2.2 for Android emulator
     if (imagePath.startsWith('http')) {
       if (imagePath.contains('localhost:3003')) {
-        return imagePath.replaceAll('localhost:3003', '10.0.2.2:3003');
+        return imagePath.replaceAll('localhost:3003', '172.20.10.2:3003');
       }
       return imagePath;
     } else {
-      return 'http://10.0.2.2:3003/uploads/$imagePath';
+      return 'http://172.20.10.2:3003/uploads/$imagePath';
     }
   }
 

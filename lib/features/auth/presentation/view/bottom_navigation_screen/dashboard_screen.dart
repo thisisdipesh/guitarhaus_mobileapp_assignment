@@ -217,124 +217,171 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        '\u20B9${guitar['price']}',
-                                        style: const TextStyle(
-                                          color: Color(0xFFFFD700),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                          fontFamily: 'Ubuntu-Bold',
+                                      Expanded(
+                                        child: Text(
+                                          '\u20B9${guitar['price']}',
+                                          style: const TextStyle(
+                                            color: Color(0xFFFFD700),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                            fontFamily: 'Ubuntu-Bold',
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        icon: Icon(
-                                          context
-                                                  .watch<FavoritesProvider>()
-                                                  .isFavorite(guitar['id'])
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color:
+                                      const SizedBox(width: 4),
+                                      Container(
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                        child: IconButton(
+                                          icon: Icon(
+                                            context
+                                                    .watch<FavoritesProvider>()
+                                                    .isFavorite(guitar['id'])
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            color:
+                                                context
+                                                        .watch<
+                                                          FavoritesProvider
+                                                        >()
+                                                        .isFavorite(
+                                                          guitar['id'],
+                                                        )
+                                                    ? Colors.redAccent
+                                                    : Color(0xFFB799FF),
+                                            size: 16,
+                                          ),
+                                          onPressed: () {
+                                            final provider =
+                                                context
+                                                    .read<FavoritesProvider>();
+                                            if (provider.isFavorite(
+                                              guitar['id'],
+                                            )) {
+                                              provider.removeFavorite(
+                                                guitar['id'],
+                                              );
+                                            } else {
+                                              provider.addFavorite(guitar);
+                                            }
+                                          },
+                                          tooltip:
                                               context
                                                       .watch<
                                                         FavoritesProvider
                                                       >()
                                                       .isFavorite(guitar['id'])
-                                                  ? Colors.redAccent
-                                                  : Color(0xFFB799FF),
+                                                  ? 'Remove from favorites'
+                                                  : 'Add to favorites',
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 32,
+                                            minHeight: 32,
+                                          ),
                                         ),
-                                        onPressed: () {
-                                          final provider =
-                                              context.read<FavoritesProvider>();
-                                          if (provider.isFavorite(
-                                            guitar['id'],
-                                          )) {
-                                            provider.removeFavorite(
-                                              guitar['id'],
-                                            );
-                                          } else {
-                                            provider.addFavorite(guitar);
-                                          }
-                                        },
-                                        tooltip:
-                                            context
-                                                    .watch<FavoritesProvider>()
-                                                    .isFavorite(guitar['id'])
-                                                ? 'Remove from favorites'
-                                                : 'Add to favorites',
                                       ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.shopping_cart,
-                                          color: Color(0xFF8F43EE),
+                                      Container(
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
                                         ),
-                                        onPressed: () async {
-                                          try {
-                                            final response = await _apiService
-                                                .addToCart(guitar['id'], 1);
-                                            print(
-                                              'Add to cart response: ${response.data}',
-                                            );
-                                            if (response.statusCode == 200 ||
-                                                response.statusCode == 201) {
-                                              if (mounted) {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (context) =>
-                                                            const CartScreen(),
-                                                  ),
-                                                );
+                                        child: IconButton(
+                                          icon: const Icon(
+                                            Icons.shopping_cart,
+                                            color: Color(0xFF8F43EE),
+                                            size: 16,
+                                          ),
+                                          onPressed: () async {
+                                            try {
+                                              final response = await _apiService
+                                                  .addToCart(guitar['id'], 1);
+                                              print(
+                                                'Add to cart response: ${response.data}',
+                                              );
+                                              if (response.statusCode == 200 ||
+                                                  response.statusCode == 201) {
+                                                if (mounted) {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              const CartScreen(),
+                                                    ),
+                                                  );
+                                                }
+                                              } else {
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        'Failed to add to cart: '
+                                                        '${response.data['message'] ?? 'Unknown error'}',
+                                                      ),
+                                                      backgroundColor:
+                                                          const Color(
+                                                            0xFFB799FF,
+                                                          ),
+                                                    ),
+                                                  );
+                                                }
                                               }
-                                            } else {
+                                            } catch (e) {
                                               if (mounted) {
                                                 ScaffoldMessenger.of(
                                                   context,
                                                 ).showSnackBar(
-                                                  SnackBar(
+                                                  const SnackBar(
                                                     content: Text(
-                                                      'Failed to add to cart: '
-                                                      '${response.data['message'] ?? 'Unknown error'}',
+                                                      'Failed to add to cart!',
                                                     ),
-                                                    backgroundColor:
-                                                        const Color(0xFFB799FF),
+                                                    backgroundColor: Color(
+                                                      0xFFB799FF,
+                                                    ),
                                                   ),
                                                 );
                                               }
                                             }
-                                          } catch (e) {
-                                            if (mounted) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Failed to add to cart!',
-                                                  ),
-                                                  backgroundColor: Color(
-                                                    0xFFB799FF,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        },
-                                        tooltip: 'Add to cart',
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.visibility,
-                                          color: Color(0xFFB799FF),
+                                          },
+                                          tooltip: 'Add to cart',
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 32,
+                                            minHeight: 32,
+                                          ),
                                         ),
-                                        onPressed:
-                                            () => _showQuickView(
-                                              context,
-                                              guitar,
-                                              index,
-                                            ),
-                                        tooltip: 'Quick view',
+                                      ),
+                                      Container(
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                        child: IconButton(
+                                          icon: const Icon(
+                                            Icons.visibility,
+                                            color: Color(0xFFB799FF),
+                                            size: 16,
+                                          ),
+                                          onPressed:
+                                              () => _showQuickView(
+                                                context,
+                                                guitar,
+                                                index,
+                                              ),
+                                          tooltip: 'Quick view',
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 32,
+                                            minHeight: 32,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -732,15 +779,16 @@ Widget _buildGuitarImage(dynamic guitarOrImagePath) {
       // Check if the image URL is already a full URL or just a filename
       String imageUrl;
       if (images[0].toString().startsWith('http')) {
-        // It's already a full URL, but need to convert localhost to 10.0.2.2 for Android emulator
+        // It's already a full URL, but need to convert localhost to the correct IP for the device
         String fullUrl = images[0].toString();
         if (fullUrl.contains('localhost:3003')) {
-          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+          fullUrl = fullUrl.replaceAll('localhost:3003', '172.20.10.2:3003');
         }
         imageUrl = '$fullUrl?v=$cacheBuster';
       } else {
         // It's just a filename, construct the full URL
-        imageUrl = 'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
+        imageUrl =
+            'http://172.20.10.2:3003/uploads/${images[0]}?v=$cacheBuster';
       }
 
       print('🖼️ Image URL: $imageUrl');
@@ -794,15 +842,15 @@ Widget _buildGuitarDetailImage(Map<String, dynamic> data) {
     // Check if the image URL is already a full URL or just a filename
     String imageUrl;
     if (images[0].toString().startsWith('http')) {
-      // It's already a full URL, but need to convert localhost to 10.0.2.2 for Android emulator
+      // It's already a full URL, but need to convert localhost to the correct IP for the device
       String fullUrl = images[0].toString();
       if (fullUrl.contains('localhost:3003')) {
-        fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+        fullUrl = fullUrl.replaceAll('localhost:3003', '172.20.10.2:3003');
       }
       imageUrl = '$fullUrl?v=$cacheBuster';
     } else {
       // It's just a filename, construct the full URL
-      imageUrl = 'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
+      imageUrl = 'http://172.20.10.2:3003/uploads/${images[0]}?v=$cacheBuster';
     }
     return Image.network(
       imageUrl,

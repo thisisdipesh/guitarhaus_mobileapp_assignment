@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+import 'theme_service.dart';
 
 class SensorService {
   static final SensorService _instance = SensorService._internal();
@@ -11,6 +12,7 @@ class SensorService {
   // Brightness variables
   double _originalBrightness = 0.5;
   bool _isAutoBrightnessEnabled = false;
+  bool _isDarkModeEnabled = false;
 
   // Accelerometer variables
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
@@ -20,6 +22,9 @@ class SensorService {
 
   // Shake detection callback
   Function? _onShakeDetected;
+
+  // Dark mode callback
+  Function? _onDarkModeChanged;
 
   // Initialize sensors
   Future<void> initialize() async {
@@ -149,13 +154,55 @@ class SensorService {
     return shakeCount >= 2;
   }
 
+  // Dark mode detection methods
+  void enableDarkModeDetection(Function onDarkModeChanged) {
+    _onDarkModeChanged = onDarkModeChanged;
+    _isDarkModeEnabled = true;
+    _startDarkModeDetection();
+  }
+
+  void disableDarkModeDetection() {
+    _onDarkModeChanged = null;
+    _isDarkModeEnabled = false;
+  }
+
+  void _startDarkModeDetection() {
+    // Check for dark mode every 30 seconds
+    Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (!_isDarkModeEnabled) {
+        timer.cancel();
+        return;
+      }
+      _checkDarkMode();
+    });
+  }
+
+  void _checkDarkMode() {
+    // Get current time to determine if it's dark mode time
+    DateTime now = DateTime.now();
+    int hour = now.hour;
+
+    // Consider dark mode from 6 PM to 6 AM
+    bool isDarkMode = hour >= 18 || hour < 6;
+
+    // Call the callback with the dark mode status
+    _onDarkModeChanged?.call(isDarkMode);
+
+    // Automatically update theme service
+    ThemeService().setDarkMode(isDarkMode);
+
+    print('Dark mode check: $isDarkMode (hour: $hour)');
+  }
+
   // Get current sensor status
   bool get isAutoBrightnessEnabled => _isAutoBrightnessEnabled;
   bool get isShakeDetectionEnabled => _accelerometerSubscription != null;
+  bool get isDarkModeEnabled => _isDarkModeEnabled;
 
   // Dispose resources
   void dispose() {
     _accelerometerSubscription?.cancel();
     _accelerometerReadings.clear();
+    disableDarkModeDetection();
   }
 }

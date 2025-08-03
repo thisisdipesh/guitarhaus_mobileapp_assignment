@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/sensor_service.dart';
+import '../../../../core/services/theme_service.dart';
+import 'package:provider/provider.dart';
 
 class SensorSettingsScreen extends StatefulWidget {
   const SensorSettingsScreen({Key? key}) : super(key: key);
@@ -12,6 +14,7 @@ class _SensorSettingsScreenState extends State<SensorSettingsScreen> {
   final SensorService _sensorService = SensorService();
   bool _isAutoBrightnessEnabled = false;
   bool _isShakeDetectionEnabled = false;
+  bool _isDarkModeEnabled = false;
   double _currentBrightness = 0.5;
 
   @override
@@ -25,12 +28,20 @@ class _SensorSettingsScreenState extends State<SensorSettingsScreen> {
     setState(() {
       _isAutoBrightnessEnabled = _sensorService.isAutoBrightnessEnabled;
       _isShakeDetectionEnabled = _sensorService.isShakeDetectionEnabled;
+      _isDarkModeEnabled = _sensorService.isDarkModeEnabled;
     });
 
     // Initialize shake detection if it was previously enabled
     if (_isShakeDetectionEnabled) {
       _sensorService.enableShakeDetection(() {
         _showShakeDetectedSnackBar();
+      });
+    }
+
+    // Initialize dark mode detection if it was previously enabled
+    if (_isDarkModeEnabled) {
+      _sensorService.enableDarkModeDetection((isDarkMode) {
+        _showDarkModeChangedSnackBar(isDarkMode);
       });
     }
   }
@@ -195,6 +206,140 @@ class _SensorSettingsScreenState extends State<SensorSettingsScreen> {
 
             const SizedBox(height: 20),
 
+            // Dark Mode Sensor Section
+            _buildSectionCard(
+              title: 'Dark Mode Sensor',
+              subtitle:
+                  'Automatically detect and adjust theme based on time of day',
+              icon: Icons.dark_mode,
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    title: const Text('Enable Dark Mode Detection'),
+                    subtitle: const Text(
+                      'Auto-detect dark/light mode based on time',
+                    ),
+                    value: _isDarkModeEnabled,
+                    onChanged: (value) {
+                      if (value) {
+                        _sensorService.enableDarkModeDetection((isDarkMode) {
+                          _showDarkModeChangedSnackBar(isDarkMode);
+                        });
+                      } else {
+                        _sensorService.disableDarkModeDetection();
+                      }
+                      setState(() {
+                        _isDarkModeEnabled = value;
+                      });
+                    },
+                  ),
+                  if (_isDarkModeEnabled) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.purple[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.purple[300]!),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.dark_mode,
+                            color: Colors.purple[700],
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Active - Monitoring time of day',
+                            style: TextStyle(
+                              color: Colors.purple[700],
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Consumer<ThemeService>(
+                    builder: (context, themeService, child) {
+                      return Row(
+                        children: [
+                          Icon(
+                            themeService.isDarkMode
+                                ? Icons.dark_mode
+                                : Icons.light_mode,
+                            color: Colors.purple[700],
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Current Theme',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  themeService.isDarkMode
+                                      ? 'Dark Mode'
+                                      : 'Light Mode',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              themeService.toggleTheme();
+                            },
+                            icon: Icon(
+                              themeService.isDarkMode
+                                  ? Icons.light_mode
+                                  : Icons.dark_mode,
+                              size: 18,
+                            ),
+                            label: Text(
+                              themeService.isDarkMode
+                                  ? 'Switch to Light'
+                                  : 'Switch to Dark',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purple[600],
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
             // Information Section
             _buildSectionCard(
               title: 'How it Works',
@@ -216,43 +361,18 @@ class _SensorSettingsScreenState extends State<SensorSettingsScreen> {
                     description:
                         'Shake your phone to refresh content:\n• Works on home screen, product listings\n• Requires moderate shake motion\n• Helps save battery by avoiding manual refresh',
                   ),
+                  const SizedBox(height: 16),
+                  _InfoItem(
+                    icon: Icons.dark_mode,
+                    title: 'Dark Mode Sensor',
+                    description:
+                        'Automatically detect dark mode based on time:\n• Dark mode: 6 PM - 6 AM\n• Light mode: 6 AM - 6 PM\n• Checks every 30 seconds\n• Provides theme adjustment notifications',
+                  ),
                 ],
               ),
             ),
 
             const SizedBox(height: 20),
-
-            // Demo Button
-            Container(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[600],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 8,
-                  shadowColor: Colors.green[600]!.withOpacity(0.3),
-                ),
-                icon: const Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 24,
-                ),
-                label: const Text(
-                  "Try Sensor Demo",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/sensor-demo');
-                },
-              ),
-            ),
           ],
         ),
       ),
@@ -316,6 +436,29 @@ class _SensorSettingsScreenState extends State<SensorSettingsScreen> {
         ),
         backgroundColor: Colors.green[600],
         duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showDarkModeChangedSnackBar(bool isDarkMode) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isDarkMode ? Icons.dark_mode : Icons.light_mode,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              isDarkMode
+                  ? 'Dark mode detected - Adjusting theme...'
+                  : 'Light mode detected - Adjusting theme...',
+            ),
+          ],
+        ),
+        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.orange[600],
+        duration: const Duration(seconds: 3),
       ),
     );
   }

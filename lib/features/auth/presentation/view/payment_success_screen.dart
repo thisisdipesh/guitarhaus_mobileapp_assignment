@@ -25,16 +25,16 @@ class PaymentSuccessScreen extends StatelessWidget {
               colors: [Color(0xFF102840), Color(0xFF232946), Color(0xFF2D1E2F)],
             ),
           ),
-          child: Center(
+          child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Success Animation Container
                   Container(
-                    width: 120,
-                    height: 120,
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: const LinearGradient(
@@ -52,43 +52,43 @@ class PaymentSuccessScreen extends StatelessWidget {
                     ),
                     child: const Icon(
                       Icons.check,
-                      size: 60,
+                      size: 50,
                       color: Colors.white,
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
                   // Success Title
                   const Text(
                     'Payment Successful!',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Ubuntu-Bold',
                     ),
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // Success Message
                   Text(
                     'Your order has been placed successfully and payment has been processed.',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
-                      fontSize: 16,
-                      height: 1.5,
+                      fontSize: 15,
+                      height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Order Details Card
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFF232946), Color(0xFF2D1E2F)],
@@ -107,20 +107,20 @@ class PaymentSuccessScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         _buildDetailRow('Order ID', orderId),
-                        const Divider(color: Colors.white24, height: 24),
+                        const Divider(color: Colors.white24, height: 16),
                         _buildDetailRow(
                           'Amount Paid',
                           '\$${amount.toStringAsFixed(2)}',
                         ),
-                        const Divider(color: Colors.white24, height: 24),
+                        const Divider(color: Colors.white24, height: 16),
                         _buildDetailRow('Payment Method', paymentMethod),
-                        const Divider(color: Colors.white24, height: 24),
+                        const Divider(color: Colors.white24, height: 16),
                         _buildDetailRow('Status', 'Confirmed'),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   // Action Buttons
                   Column(
@@ -128,7 +128,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                       // View Order Button
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 48,
                         child: ElevatedButton(
                           onPressed: () {
                             // Navigate to My Orders screen
@@ -147,7 +147,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                           child: const Text(
                             'View My Orders',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               fontFamily: 'Ubuntu-Bold',
@@ -156,12 +156,12 @@ class PaymentSuccessScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 10),
 
                       // Continue Shopping Button
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 48,
                         child: OutlinedButton(
                           onPressed: () {
                             Navigator.of(context).pushNamedAndRemoveUntil(
@@ -181,7 +181,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                           child: const Text(
                             'Continue Shopping',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFFB799FF),
                               fontFamily: 'Ubuntu-Bold',
@@ -192,11 +192,11 @@ class PaymentSuccessScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
 
                   // Additional Info
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -209,31 +209,34 @@ class PaymentSuccessScreen extends StatelessWidget {
                             Icon(
                               Icons.email,
                               color: Color(0xFFB799FF),
-                              size: 20,
+                              size: 18,
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: 6),
                             Text(
                               'Confirmation Email',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: 15,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         Text(
                           'You will receive a confirmation email with order details and tracking information.',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.7),
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
+
+                  // Bottom padding to prevent overflow
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -245,18 +248,31 @@ class PaymentSuccessScreen extends StatelessWidget {
 
   Widget _buildDetailRow(String label, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16),
+        // Label - fixed width to prevent overflow
+        SizedBox(
+          width: 100,
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 15,
+            ),
+          ),
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        const SizedBox(width: 12),
+        // Value - takes remaining space
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
           ),
         ),
       ],

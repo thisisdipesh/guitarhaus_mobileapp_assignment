@@ -1,17 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import '../config/api_config.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:3003/api/v1';
+  static const String baseUrl = ApiConfig.baseUrl;
   late Dio _dio;
 
   ApiService() {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        headers: {'Content-Type': 'application/json'},
+        connectTimeout: Duration(seconds: ApiConfig.connectTimeout),
+        receiveTimeout: Duration(seconds: ApiConfig.receiveTimeout),
+        headers: ApiConfig.defaultHeaders,
       ),
     );
 

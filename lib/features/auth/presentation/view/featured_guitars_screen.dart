@@ -473,12 +473,13 @@ class _FeaturedGuitarsScreenState extends State<FeaturedGuitarsScreen> {
         // It's already a full URL, but need to convert localhost to 10.0.2.2 for Android emulator
         String fullUrl = images[0].toString();
         if (fullUrl.contains('localhost:3003')) {
-          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+          fullUrl = fullUrl.replaceAll('localhost:3003', '172.20.10.2:3003');
         }
         imageUrl = '$fullUrl?v=$cacheBuster';
       } else {
         // It's just a filename, construct the full URL
-        imageUrl = 'http://10.0.2.2:3003/uploads/${images[0]}?v=$cacheBuster';
+        imageUrl =
+            'http://172.20.10.2:3003/uploads/${images[0]}?v=$cacheBuster';
       }
 
       print('Featured guitar image URL: $imageUrl'); // Debug

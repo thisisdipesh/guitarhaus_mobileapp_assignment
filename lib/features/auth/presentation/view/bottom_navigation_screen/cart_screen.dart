@@ -644,22 +644,27 @@ class _CartScreenState extends State<CartScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Total Amount:',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Ubuntu-Bold',
+                  const Expanded(
+                    child: Text(
+                      'Total Amount:',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Ubuntu-Bold',
+                      ),
                     ),
                   ),
-                  Text(
-                    '₹${totalAmount.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      color: Color(0xFFFFD700),
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Ubuntu-Bold',
+                  Flexible(
+                    child: Text(
+                      '₹${totalAmount.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Color(0xFFFFD700),
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Ubuntu-Bold',
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -697,16 +702,19 @@ class _CartScreenState extends State<CartScreen> {
                       Icon(
                         Icons.shopping_cart_checkout,
                         color: Colors.white,
-                        size: 26,
+                        size: 22,
                       ),
-                      SizedBox(width: 14),
-                      Text(
-                        'Proceed to Checkout',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontFamily: 'Ubuntu-Bold',
+                      SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          'Proceed to Checkout',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: 'Ubuntu-Bold',
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -773,7 +781,7 @@ class _CartScreenState extends State<CartScreen> {
         // Convert localhost to 10.0.2.2 for Android emulator
         String fullUrl = imagePath;
         if (fullUrl.contains('localhost:3003')) {
-          fullUrl = fullUrl.replaceAll('localhost:3003', '10.0.2.2:3003');
+          fullUrl = fullUrl.replaceAll('localhost:3003', '172.20.10.2:3003');
         }
         print('Using network image: $fullUrl');
         return buildImageWidget(fullUrl);
@@ -804,7 +812,8 @@ class _CartScreenState extends State<CartScreen> {
     } else {
       // Construct the full URL for backend images with cache-busting
       final cacheBuster = DateTime.now().millisecondsSinceEpoch;
-      final fullUrl = 'http://10.0.2.2:3003/uploads/$imagePath?v=$cacheBuster';
+      final fullUrl =
+          'http://172.20.10.2:3003/uploads/$imagePath?v=$cacheBuster';
       print('Constructed full URL: $fullUrl');
       return buildImageWidget(fullUrl);
     }
